@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引入 Element UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入 Vue -->
+    <script src="js/Vue.main.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="">
+            <el-input v-model="formInline.user" placeholder="请输入搜索的内容"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="success" @click="onSubmit">查询</el-button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <el-button type="primary" @click="openNew">写公告</el-button>
+            <el-button type="danger" @click="deleteByTitle">批量删除</el-button>
+        </el-form-item>
+    </el-form>
+    <!--表格-->
+    <template>
+        <el-table
+                ref="table"
+                :data="tableData"
+                @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll"
+                @select="handleSelect"
+                style="width: 100%">
+            <!--复选框-->
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <el-table-column
+                    label="id"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>ID: {{ scope.row.id }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.id }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="公告标题"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.title }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="发布者"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.author }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column
+                    label="浏览权限"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ getType(scope.row.type) }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column
+                    label="发布时间"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                </template>
+            </el-table-column>
+            <!-- 在操作列中添加查看按钮 -->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="info"
+                            @click="handleView(scope.row)">查看</el-button>
+                    <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        method: "post",
+        data(){
+            return{
+                formInline: {
+                    user: '',
+                    region: ''
+                },
+                //
+                isView: false, // 是否是查看模式
+                noticeForm: {
+                    visibility: '',
+                    title: '',
+                    publisher: '',
+                    content: ''
+                },
+                ids:[],
+                tableData: [{
+                    id:"1",
+                    date: '2016-05-02',
+                    title:"毕业通知",
+                    author:"管理员",
+                    type:1,
+                }, {
+                    id:"2",
+                    date: '2016-05-04',
+                    title:"2018年运动会",
+                    author:"管理员",
+                    type:1,
+                }, {
+                    id:"3",
+                    date: '2016-05-01',
+                    title:"hello",
+                    author:"管理员",
+                    type:2,
+                }, {
+                    id:"6",
+                    date: '2016-05-03',
+                    title:"hello2",
+                    author:"管理员",
+                    type:3,
+                }]
+            }
+        },
+        methods:{
+            onSubmit() {
+                // todo:模糊查询
+                // console.log(this.formInline.user)
+
+            },
+            openNew(){
+                location.href = 'node.html'
+            },
+            // 批量删除
+            deleteByTitle(){
+                // todo
+            },
+            // 查看公告
+            handleView(row) {
+                // todo
+                // location.href = 'node.html';
+            },
+            // 编辑公告
+            handleEdit(row) {
+                // todo：编辑公告
+                // location.href = 'node.html';
+            },
+            // 删除公告
+            handleDelete(index,row){
+                // todo：根据id删除
+                // console.log( row.id)
+            },
+            // 表格多选框选中事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+
+
+            // 全选
+            handleSelectAll(selection) {
+                this.multipleSelection = selection;
+                this.ids = this.multipleSelection.map(item => item.name);
+            },
+
+            // 单选
+            handleSelect(selection, row) {
+                this.multipleSelection = selection;
+                this.ids = this.multipleSelection.map(item => item.name);
+            },
+            // 根据type返回相应的数据
+            getType(type){
+                switch (type){
+                    case  1:
+                        return '全体可见'
+                    case 2:
+                        return '教师可见'
+                    case 3:
+                        return '草稿'
+                }
+            },
+        }
+    })
+</script>
+</html>

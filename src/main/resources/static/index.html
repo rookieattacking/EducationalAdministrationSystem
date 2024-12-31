@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>教务管理系统</title>
+    <!-- 引入 Element UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入 Vue -->
+    <script src="js/Vue.main.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+    #app {
+        height: 100%;
+    }
+    .el-container {
+        height: 100%;
+    }
+    .el-header {
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding: 0 20px;
+    }
+    .header-logo {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .header-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+    .header-nav li a {
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        text-decoration: none;
+        color: #333;
+    }
+    .header-nav li a i {
+        margin-right: 5px;
+    }
+    .header-right {
+        display: flex;
+        align-items: center;
+    }
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    .el-aside {
+        background-color: #545c64;
+    }
+    .el-menu {
+        border-right: none;
+    }
+    .el-menu a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        padding-left: 20px;
+    }
+    .el-main {
+        padding: 0;
+        background-color: #f0f2f5;
+    }
+    .el-footer {
+        background-color: #fff;
+        color: #666;
+        text-align: center;
+        line-height: 60px;
+        border-top: 1px solid #ddd;
+    }
+</style>
+<body>
+<div id="app">
+    <el-container>
+        <!-- 头部 -->
+        <el-header>
+            <div class="header-logo">教务管理系统</div>
+
+            <ul class="header-nav">
+                <li>
+                    <a href="home.html" target="mainFrame">
+                        <i class="el-icon-s-home"></i>
+                        主页
+                    </a>
+                </li>
+            </ul>
+
+            <div class="header-right">
+                <el-dropdown>
+                        <span class="el-dropdown-link">
+                            <img src="images/suolong1.jpg" class="user-avatar">
+                            {{ username }}
+                            <i class="el-icon-arrow-down"></i>
+                        </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>
+                            <!--todo:基本资料-->
+                            <a href="basicInformation.html" target="mainFrame">基本资料</a>
+                        </el-dropdown-item>
+                        <el-dropdown-item>
+                            <a href="user/passwordReset.html" target="mainFrame">修改密码</a>
+                        </el-dropdown-item>
+                        <el-dropdown-item>
+                            <a href="javascript:void(0)" @click="logout">退出</a>
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </div>
+        </el-header>
+
+        <el-container>
+            <!-- 侧边栏 -->
+            <el-aside width="200px">
+                <el-menu default-active="1" class="el-menu-vertical" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+                    <!-- 系统管理 -->
+                    <el-submenu index="1">
+                        <template slot="title">
+                            <i class="el-icon-setting"></i>
+                            <span>系统管理</span>
+                        </template>
+                        <el-menu-item>
+                            <a href="userManage.html" target="mainFrame">用户管理</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="roleManage.html" target="mainFrame">角色管理</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="notifFcation.html" target="mainFrame">通知管理</a>
+                        </el-menu-item>
+                    </el-submenu>
+
+                    <!-- 信息管理 -->
+                    <el-submenu index="2">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>
+                            <span>信息管理</span>
+                        </template>
+                        <el-menu-item>
+                            <a href="student.html" target="mainFrame">学生信息</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="teacher.html" target="mainFrame">教师信息</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="course.html" target="mainFrame">基本课程管理</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="class.html" target="mainFrame">班级信息</a>
+                        </el-menu-item>
+                    </el-submenu>
+
+
+                    <!-- 课程管理 -->
+                    <el-submenu index="2">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>
+                            <span>课程管理</span>
+                        </template>
+                        <el-menu-item>
+                            <a href="courseManage.html" target="mainFrame">课程信息(管理员)</a>
+                        </el-menu-item>
+                    </el-submenu>
+
+                    <!-- 信息报表 -->
+                    <el-submenu index="3">
+                        <template slot="title">
+                            <i class="el-icon-reading"></i>
+                            <span>信息报表</span>
+                        </template>
+                        <el-menu-item>
+                            <a href="input.html" target="mainFrame">成绩报表</a>
+                        </el-menu-item>
+                        <el-menu-item>
+                            <a href="query.html" target="mainFrame">人数报表</a>
+                        </el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-aside>
+
+            <!-- 主要内容区域 -->
+            <el-main>
+                <iframe name="mainFrame" src="home.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            </el-main>
+        </el-container>
+
+        <!-- 底部 -->
+        <el-footer>
+            © www.zhangqingeas.online - 底部固定区域
+        </el-footer>
+    </el-container>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            username: '管理员'
+        },
+        methods: {
+            logout() {
+                this.$confirm('确定要退出吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    window.location.href = 'login.html';
+                })
+            }
+        }
+    })
+</script>
+
+
+</body>
+</html>

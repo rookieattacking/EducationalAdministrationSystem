@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.EasScoreMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.EasScore">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="score" column="score" jdbcType="INTEGER"/>
+            <result property="result" column="result" jdbcType="VARCHAR"/>
+            <result property="sId" column="s_id" jdbcType="INTEGER"/>
+            <result property="cId" column="c_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,score,result,
+        s_id,c_id
+    </sql>
+</mapper>

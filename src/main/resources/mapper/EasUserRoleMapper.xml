@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.EasUserRoleMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.EasUserRole">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="easUserId" column="eas_user_id" jdbcType="INTEGER"/>
+            <result property="easRoleId" column="eas_role_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,eas_user_id,eas_role_id
+    </sql>
+</mapper>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="课程名称">
+            <el-input v-model="formInline.coursename" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="课程简介">
+            <el-input v-model="formInline.synopsis" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+    <!--操作按钮-->
+    <el-row>
+        <el-button type="success" plain @click="dialogVisible = true" icon="el-icon-edit">添加</el-button>
+        <!--批量删除-->
+        <el-button type="danger" plain icon="el-icon-delete" @click="deleteByIds">批量删除</el-button>
+    </el-row>
+
+    <!--编辑课程和修改课程信息-->
+    <el-dialog
+            :title="dialogType === 'add' ? '添加基本课程' : '修改基本课程'"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="课程名称">
+                <el-input v-model="form.coursename"></el-input>
+            </el-form-item>
+            <el-form-item label="课程简介">
+                <el-input type="textarea" v-model="form.synopsis"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="handleSubmit">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+    <!--表格-->
+    <template>
+        <el-table
+                ref="table"
+                :data="tableData"
+                @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll"
+                @select="handleSelect"
+                style="width: 100%">
+            <!--复选框-->
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <!--id-->
+            <el-table-column
+                    label="ID"
+                    sortable
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <!--课程名称-->
+            <el-table-column
+                    label="课程名称"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>姓名: {{ scope.row.coursename }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.coursename }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <!--课程简介-->
+            <el-table-column
+                    label="课程简介"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>姓名: {{ scope.row.synopsis }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.synopsis }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+
+
+            <!--操作-->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+</div>
+</body>
+<script>
+    new Vue({
+        el:"#app",
+        method:"post",
+        data(){
+            return{
+                formInline: {
+                    coursename: '',
+                    synopsis: ''
+                },
+                // ... 其他数据
+                multipleSelection: [], // 存储选中的行
+                dialogVisible: false,
+                /*批量删除*/
+                ids:[],
+                /*修改时的返回数据*/
+                form: {
+                    coursename: '',
+                    synopsis: '',
+                },
+                // 添加一个变量区分是添加还是编辑
+                dialogType: 'add', // 'add' 或 'edit'
+                // 关闭按钮
+                handleClose(done) {
+                    done();
+                },
+                tableData: [{
+                    id:'1',
+                    coursename: '王小虎',
+                    synopsis:"admin",
+                }, {
+                    id:'2',
+                    coursename: '王虎',
+                    synopsis:"admin",
+                }, {
+                    id:'3',
+                    coursename: '王大虎',
+                    synopsis:"admin",
+                }, {
+                    id:'6',
+                    coursename: '王小虎',
+                    synopsis:"admin",
+                }],
+            }
+        },
+        methods:{
+            onSubmit() {
+                console.log('submit!');
+            },
+            add(){
+              //todo:
+                alert("添加")
+            },
+            updateSynopsis(){
+                // todo：修改
+                alert("修改")
+            },
+            deleteByIds(){
+                /*todo：批量删除*/
+                console.log(this.ids)
+
+            },
+            // 统一处理表单提交
+            handleSubmit() {
+                this.$refs.form.validate((valid) => {
+                    if (valid) {
+                        if (this.dialogType === 'add') {
+                            // 处理添加
+                            this.add();
+                        } else {
+                            // 处理更新
+                            this.updateSynopsis();
+                        }
+                    }
+                });
+            },
+            // 处理编辑按钮点击时显示的内容
+            handleEdit(row) {
+                this.dialogType = 'edit';
+                this.dialogVisible = true;
+                // 复制数据到编辑表单
+                this.form = {
+                    coursename: row.coursename,
+                    synopsis: row.synopsis,
+                };
+            },
+
+            // 表格多选框选中事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+
+
+            // 全选
+            handleSelectAll(selection) {
+                this.multipleSelection = selection;
+                this.ids = selection.map(item => item.id);
+            },
+
+            // 单选
+            handleSelect(selection, row) {
+                this.multipleSelection = selection;
+                this.ids = selection.map(item => item.id);
+            },
+            // 清空选择
+            clearSelection() {
+                this.$refs.table.clearSelection();
+            },
+            // 删除操作(单个删除）
+            handleDelete(index, row) {
+                // todo:根据id删除
+                console.log(row.id)
+            },
+        }
+    })
+</script>
+</html>

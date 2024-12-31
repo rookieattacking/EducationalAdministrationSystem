@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    username: root
+    password: 20010720Lmx
+    url: jdbc:mysql://47.109.206.82:3306/softWare3_fiveGroups
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  transaction:
+    rollback-on-commit-failure: true
+    default-timeout: 30
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

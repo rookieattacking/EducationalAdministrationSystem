@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.EasClassMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.EasClass">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="classes" column="classes" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,classes
+    </sql>
+</mapper>

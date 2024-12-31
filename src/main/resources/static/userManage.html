@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <!-- 引入 Element UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入 Vue -->
+    <script src="js/Vue.main.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="js/index.js"></script>
+    <!-- 引入 axios -->
+    <script src="js/axios.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <!--输入搜索框-->
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="用户名">
+            <el-input v-model="formInline.user" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+            <el-select v-model="formInline.region" placeholder="请选择">
+                <el-option label="超级管理员" value="超级管理员"></el-option>
+                <el-option label="学生" value="学生"></el-option>
+                <el-option label="教师" value="教师"></el-option>
+                <el-option label="通知管理员" value="通知管理员"></el-option>
+                <el-option label="课程管理员" value="课程管理员"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+    <!--操作按钮-->
+    <el-row>
+        <el-button type="success" plain @click="dialogVisible = true" icon="el-icon-edit">添加</el-button>
+        <!--批量删除-->
+        <el-button type="danger" plain icon="el-icon-delete" @click="DeleteByIds">批量删除</el-button>
+    </el-row>
+
+    <!--编辑用户添加用户-->
+    <el-dialog
+            :title="dialogType === 'add' ? '添加用户' : '修改用户'"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+
+        <el-form ref="updateForm" :model="updateForm" label-width="80px">
+            <el-form-item label="用户名">
+                <el-input v-model="updateForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="密码">
+                <el-input v-model="updateForm.pwd" type="password"></el-input>
+            </el-form-item>
+            <el-form-item label="加密盐值">
+                <el-input v-model="updateForm.nickname"></el-input>
+            </el-form-item>
+            <el-form-item label="是否锁定">
+                <el-switch
+                    v-model="updateForm.available"
+                    :active-value="1"
+                    :inactive-value="0"
+                    @change="handleSwitchChange">
+            </el-switch>
+            </el-form-item>
+            <el-form-item label="用户角色">
+                <el-select v-model="updateForm.region" placeholder="请选择角色">
+                    <el-option label="区域一" value="shanghai"></el-option>
+                    <el-option label="区域二" value="beijing"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="handleSubmit">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+    <!--表格-->
+    <template>
+        <el-table
+                ref="table"
+                :data="tableData"
+                @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll"
+                @select="handleSelect"
+                style="width: 100%">
+            <!--复选框-->
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <!--id-->
+            <el-table-column
+                    label="ID"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <!--姓名-->
+            <el-table-column
+                    label="姓名"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>姓名: {{ scope.row.name }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.name }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+            <!--盐值-->
+            <el-table-column
+                    label="盐值"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>盐值: {{ scope.row.nickname }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.nickname }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+            <!--是否锁定-->
+            <el-table-column
+                    label="是否锁定"
+                    width="100">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.available"
+                            @change="handleStatusChange(scope.row)"
+                            :active-value="1"
+                            :inactive-value="0"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949">
+                    </el-switch>
+                </template>
+            </el-table-column>
+
+            <!--所属角色-->
+            <el-table-column
+                    label="所属角色"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>姓名: {{ scope.row.role }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.role }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+
+            <!--注册日期-->
+            <el-table-column
+                    label="注册日期"
+                    width="180">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                </template>
+            </el-table-column>
+            <!--操作-->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        method:"post",
+        data() {
+            return {
+                formInline: {
+                    user: '',
+                    region: ''
+                },
+                // ... 其他数据
+                multipleSelection: [], // 存储选中的行
+                dialogVisible: false,
+                form: {
+                    name: '',
+                    pwd:"",
+                    nickname:"",
+                    role:"",
+                    region: '',
+                    date1: '',
+                    date2: '',
+                    delivery: false,
+                    type: [],
+                    resource: '',
+                    desc: ''
+                },
+                /*批量删除*/
+                ids:[],
+                /*修改时的返回数据*/
+                updateForm: {
+                    name: '',
+                    pwd: '',
+                    nickname: '',
+                    region: '',
+                    available: 1  // 添加是否启用字段
+                },
+                // 添加一个变量区分是添加还是编辑
+                dialogType: 'add', // 'add' 或 'edit'
+                // 页面中表格显示的内容
+                tableData: [{
+                    id:'1',
+                    name: '王小虎',
+                    nickname:"admin",
+                    role:"管理员",
+                    date: '2016-05-02',
+                    available: 1
+                }, {
+                    id:'2',
+                    date: '2016-05-04',
+                    name: '王虎',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 1
+                }, {
+                    id:'3',
+                    date: '2016-05-01',
+                    name: '王大虎',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 0
+                }, {
+                    id:'6',
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 1
+                }],
+            }
+        },
+        methods: {
+            // 模糊查询
+            onSubmit() {
+                //todo:模糊查询
+                // console.log(this.formInline.user + " " + this.formInline.region)
+            },
+            // 关闭按钮
+            handleClose(done) {
+                done();
+            },
+            // 添加用户
+            add() {
+                // todo:添加
+                // alert("添加")
+            },
+            // 批量删除
+            DeleteByIds(){
+                //todo:根据
+                console.log(this.ids)
+            },
+            // 处理编辑按钮点击时显示的内容
+            handleEdit(row) {
+                this.dialogType = 'edit';
+                this.dialogVisible = true;
+                // 复制数据到编辑表单
+                this.updateForm = {
+                    name: row.name,
+                    pwd: '**********', // 密码通常不回显
+                    nickname: row.nickname,
+                    region: row.role,
+                    delivery: row.delivery || false,
+                    available: row.available // 添加状态字段
+                };
+            },
+            // 处理开关状态变化
+            handleSwitchChange(val) {
+                this.updateForm.available = val ? 1 : 0;
+            },
+
+            // 表格多选框选中事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+
+
+            // 全选
+            handleSelectAll(selection) {
+                this.multipleSelection = selection;
+                this.ids = this.multipleSelection.map(item => item.id);
+            },
+
+            // 单选
+            handleSelect(selection, row) {
+                this.multipleSelection = selection;
+                this.ids = this.multipleSelection.map(item => item.id);
+            },
+            // 清空选择
+            clearSelection() {
+                this.$refs.table.clearSelection();
+            },
+            updateUser(){
+                // todo：修改
+                console.log(this.ids)
+                // alert("修改")
+            },
+            // 统一处理表单提交
+            handleSubmit() {
+                this.$refs.updateForm.validate((valid) => {
+                    if (valid) {
+                        if (this.dialogType === 'add') {
+                            // 处理添加
+                            this.add();
+                        } else {
+                            // 处理更新
+                            this.updateUser();
+                        }
+                    }
+                });
+            },
+            // 删除操作(单个删除）
+            handleDelete(index, row) {
+                // todo:根据id删除
+                console.log(row.id)
+            },
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>教务管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #000000;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            width: 360px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+            margin-top: 80px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .title h1 {
+            color: #409EFF;
+            font-size: 25px;
+        }
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .captcha-img {
+            height: 40px;
+            cursor: pointer;
+        }
+        .register-link {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .register-link a {
+            color: #409EFF;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="container">
+        <div class="login-box">
+            <div class="title">
+                <h1>教务管理系统</h1>
+            </div>
+            <el-form :model="loginForm" :rules="rules" ref="loginForm">
+                <el-form-item prop="username">
+                    <el-input
+                            v-model="loginForm.username"
+                            prefix-icon="el-icon-user"
+                            placeholder="用户名">
+                    </el-input>
+                </el-form-item>
+
+                <el-form-item prop="password">
+                    <el-input
+                            v-model="loginForm.password"
+                            prefix-icon="el-icon-lock"
+                            type="password"
+                            placeholder="密码">
+                    </el-input>
+                </el-form-item>
+
+                <el-form-item prop="captcha">
+                    <div class="captcha-container">
+                        <el-input
+                                v-model="loginForm.captcha"
+                                prefix-icon="el-icon-key"
+                                placeholder="验证码"
+                                style="width: 70%">
+                        </el-input>
+                        <img
+                                :src="captchaUrl"
+                                class="captcha-img"
+                                @click="refreshCaptcha"
+                                alt="验证码">
+                    </div>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button
+                            type="primary"
+                            @click="handleLogin"
+                            style="width: 100%">
+                        登 录
+                    </el-button>
+                </el-form-item>
+            </el-form>
+
+            <div class="register-link">
+                <a @click="showRegisterDialog">立即注册</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册对话框 -->
+    <el-dialog
+            title="用户注册"
+            :visible.sync="registerVisible"
+            width="500px">
+        <el-form :model="registerForm" :rules="registerRules" ref="registerForm">
+            <el-form-item label="用户名" prop="username">
+                <el-input v-model="registerForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input type="password" v-model="registerForm.password"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="confirmPassword">
+                <el-input type="password" v-model="registerForm.confirmPassword"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer">
+            <el-button @click="resetRegisterForm">重 置</el-button>
+            <el-button type="primary" @click="handleRegister">注 册</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<script src="js/Vue.main.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="js/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            // 密码确认验证
+            const validateConfirmPassword = (rule, value, callback) => {
+                if (value !== this.registerForm.password) {
+                    callback(new Error('两次输入的密码不一致'));
+                } else {
+                    callback();
+                }
+            };
+
+            return {
+                loginForm: {
+                    username: '',
+                    password: '',
+                    captcha: '',
+                    rememberMe: false
+                },
+                registerForm: {
+                    username: '',
+                    password: '',
+                    confirmPassword: ''
+                },
+                captchaUrl: '/validatecode',
+                registerVisible: false,
+                rules: {
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入密码', trigger: 'blur' }
+                    ],
+                    captcha: [
+                        { required: true, message: '请输入验证码', trigger: 'blur' }
+                    ]
+                },
+                registerRules: {
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入密码', trigger: 'blur' }
+                    ],
+                    confirmPassword: [
+                        { required: true, message: '请确认密码', trigger: 'blur' },
+                        { validator: validateConfirmPassword, trigger: 'blur' }
+                    ]
+                }
+            }
+        },
+        mounted() {
+            this.initParticles();
+        },
+        methods: {
+            // 刷新验证码
+            refreshCaptcha() {
+                this.captchaUrl = `/validatecode?t=${new Date().getTime()}`;
+            },
+
+            // 处理登录
+            handleLogin() {
+                this.$refs.loginForm.validate(async (valid) => {
+                    if (valid) {
+                        try {
+                            const response = await axios.post('/easLogin/login', this.loginForm);
+                            if (response.data.code === 0) {
+                                this.$message.success('登录成功');
+                                window.location.href = '/easLogin/main';
+                            } else {
+                                this.$message.error(response.data.msg);
+                                this.refreshCaptcha();
+                            }
+                        } catch (error) {
+                            this.$message.error('登录失败，请稍后重试');
+                            console.error('Login error:', error);
+                        }
+                    }
+                });
+            },
+
+            // 显示注册对话框
+            showRegisterDialog() {
+                this.registerVisible = true;
+            },
+
+            // 处理注册
+            handleRegister() {
+                this.$refs.registerForm.validate(async (valid) => {
+                    if (valid) {
+                        try {
+                            const response = await axios.post('/easRegister/registerUser', this.registerForm);
+                            if (response.data.code === 0) {
+                                this.$message.success('注册成功');
+                                this.registerVisible = false;
+                                this.resetRegisterForm();
+                            } else {
+                                this.$message.error(response.data.msg);
+                            }
+                        } catch (error) {
+                            this.$message.error('注册失败，请稍后重试');
+                            console.error('Register error:', error);
+                        }
+                    }
+                });
+            },
+
+            // 重置注册表单
+            resetRegisterForm() {
+                this.$refs.registerForm.resetFields();
+            },
+
+            // 初始化粒子效果
+            initParticles() {
+                particlesJS('app', {
+                    particles: {
+                        number: { value: 80 },
+                        color: { value: '#7ec7fd' },
+                        shape: { type: 'circle' },
+                        opacity: { value: 0.5 },
+                        size: { value: 3 },
+                        line_linked: {
+                            enable: true,
+                            distance: 150,
+                            color: '#7ec7fd',
+                            opacity: 0.4,
+                            width: 1
+                        },
+                        move: {
+                            enable: true,
+                            speed: 6
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

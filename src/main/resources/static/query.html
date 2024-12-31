@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>统计图表</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .charts-container {
+            position: relative;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 1300px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #909399;
+            z-index: 1000;
+        }
+
+        .close-btn:hover {
+            color: #409EFF;
+        }
+
+        .charts-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .chart-box {
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="charts-container">
+
+        <!-- 图表容器 -->
+        <div class="charts-wrapper">
+            <div id="SAndTEchart" class="chart-box"></div>
+            <div id="SexEchart" class="chart-box"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                teacherStudentChart: null,
+                genderChart: null
+            }
+        },
+        mounted() {
+            this.initCharts();
+        },
+        methods: {
+            initCharts() {
+                // 初始化教师学生人数图表
+                this.teacherStudentChart = echarts.init(document.getElementById('SAndTEchart'));
+                this.initTeacherStudentChart();
+
+                // 初始化性别比例图表
+                this.genderChart = echarts.init(document.getElementById('SexEchart'));
+                this.initGenderChart();
+
+                // 添加窗口大小改变时的自适应
+                window.addEventListener('resize', () => {
+                    this.teacherStudentChart.resize();
+                    this.genderChart.resize();
+                });
+            },
+
+            initTeacherStudentChart() {
+                const option = {
+                    title: {
+                        text: '教师学生人数统计'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['教师人数', '学生人数']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value'
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: ['人数']
+                    },
+                    series: [
+                        {
+                            name: '教师人数',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [20]
+                        },
+                        {
+                            name: '学生人数',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [200]
+                        }
+                    ]
+                };
+
+                this.teacherStudentChart.setOption(option);
+            },
+
+            initGenderChart() {
+                const option = {
+                    title: {
+                        text: '男女人数比例',
+                        left: 'center',  // 标题居中
+                        top: '5%'        // 距离顶部距离
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b}: {c} ({d}%)'  // 添加百分比显示
+                    },
+                    legend: {
+                        orient: 'horizontal',    // 改为水平布局
+                        top: 'bottom',          // 图例位置改到底部
+                        left: 'center',         // 图例居中
+                        padding: [15, 0, 0, 0]  // 增加与饼图的间距
+                    },
+                    series: [
+                        {
+                            name: '性别比例',
+                            type: 'pie',
+                            radius: ['40%', '70%'],  // 改为环形图，更美观
+                            center: ['50%', '50%'],  // 饼图位置居中
+                            avoidLabelOverlap: true, // 避免标签重叠
+                            itemStyle: {
+                                borderRadius: 10,    // 圆角效果
+                                borderColor: '#fff', // 边框颜色
+                                borderWidth: 2       // 边框宽度
+                            },
+                            label: {
+                                show: true,
+                                position: 'inside',  // 标签位置改为内部
+                                formatter: '{b}\n{d}%'  // 显示名称和百分比
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: '16',
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            data: [
+                                {
+                                    value: 120,
+                                    name: '男生人数',
+                                    itemStyle: { color: '#5470c6' }  // 设置颜色
+                                },
+                                {
+                                    value: 80,
+                                    name: '女生人数',
+                                    itemStyle: { color: '#ee6666' }  // 设置颜色
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                this.genderChart.setOption(option);
+            },
+
+        },
+        beforeDestroy() {
+            // 销毁图表实例
+            if (this.teacherStudentChart) {
+                this.teacherStudentChart.dispose();
+            }
+            if (this.genderChart) {
+                this.genderChart.dispose();
+            }
+            // 移除窗口大小改变的监听
+            window.removeEventListener('resize');
+        }
+    })
+</script>
+</body>
+</html>

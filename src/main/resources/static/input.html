@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>成绩报表</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .report-container {
+            position: relative;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #909399;
+            z-index: 1000;
+        }
+
+        .close-btn:hover {
+            color: #409EFF;
+        }
+
+        .select-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 800px;
+            height: 400px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="report-container">
+
+        <!-- 课程选择 -->
+        <div class="select-container">
+            <el-form :inline="true">
+                <el-form-item label="请选择要查看的课程">
+                    <el-select
+                            v-model="selectedCourse"
+                            placeholder="请选择"
+                            @change="handleCourseChange">
+                        <el-option
+                                v-for="item in courseOptions"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+        </div>
+
+        <!-- 图表容器 -->
+        <div id="scoreChart" class="chart-container"></div>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                selectedCourse: '',
+                courseOptions: [
+                    { value: '1', label: 'C语言程序设计' },
+                    { value: '2', label: '数据结构与算法' },
+                    { value: '3', label: '操作系统' },
+                    { value: '4', label: '计算机网络' },
+                    { value: '5', label: '软件工程' },
+                    // ... 其他课程选项
+                ],
+                chart: null
+            }
+        },
+        mounted() {
+            this.initChart();
+        },
+        methods: {
+            initChart() {
+                this.chart = echarts.init(document.getElementById('scoreChart'));
+                this.updateChart();
+            },
+
+            updateChart() {
+                // 示例数据，实际应该根据选择的课程从后端获取
+                const option = {
+                    title: {
+                        text: '课程成绩分布'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['不及格', '及格', '良好', '优秀']
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ['成绩分布']
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '不及格',
+                            type: 'bar',
+                            stack: 'total',
+                            data: [5]
+                        },
+                        {
+                            name: '及格',
+                            type: 'bar',
+                            stack: 'total',
+                            data: [10]
+                        },
+                        {
+                            name: '良好',
+                            type: 'bar',
+                            stack: 'total',
+                            data: [15]
+                        },
+                        {
+                            name: '优秀',
+                            type: 'bar',
+                            stack: 'total',
+                            data: [8]
+                        }
+                    ]
+                };
+
+                this.chart.setOption(option);
+            },
+
+            handleCourseChange(value) {
+                // 这里应该调用后端API获取新的数据
+                console.log('选择的课程:', value);
+                this.updateChart(); // 更新图表数据
+            },
+
+        },
+        beforeDestroy() {
+            // 销毁图表实例
+            if (this.chart) {
+                this.chart.dispose();
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引入 Element UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入 Vue -->
+    <script src="js/Vue.main.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="js/index.js"></script>
+    <!-- 引入 axios -->
+    <script src="js/axios.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--操作按钮-->
+    <el-row>
+        <el-button type="success" plain @click="dialogVisible = true" icon="el-icon-edit">添加</el-button>
+        <!--批量删除-->
+        <el-button type="danger" plain icon="el-icon-delete" @click="deletebyIds">批量删除</el-button>
+    </el-row>
+
+    <!--编辑用户添加用户-->
+    <el-dialog
+            :title="dialogType === 'add' ? '添加角色' : '修改角色'"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+
+        <el-form ref="updateForm" :model="updateForm" label-width="80px">
+            <el-form-item label="角色名称">
+                <el-input v-model="updateForm.nickname"></el-input>
+            </el-form-item>
+            <el-form-item label="是否启用">
+                <el-switch
+                        v-model="updateForm.available"
+                        :active-value="1"
+                        :inactive-value="0"
+                        @change="handleSwitchChange">
+                </el-switch>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="handleSubmit">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+    <!--表格-->
+    <template>
+        <el-table
+                ref="table"
+                :data="tableData"
+                @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll"
+                @select="handleSelect"
+                style="width: 100%">
+            <!--复选框-->
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <!--id-->
+            <el-table-column
+                    label="ID"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <!--姓名-->
+            <el-table-column
+                    label="角色名称"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>角色名称: {{ scope.row.name }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.name }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+
+            <!--是否启用-->
+            <el-table-column
+                    label="是否启用"
+                    width="100">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.available"
+                            @change="handleStatusChange(scope.row)"
+                            :active-value="1"
+                            :inactive-value="0"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949">
+                    </el-switch>
+                </template>
+            </el-table-column>
+
+            <!--操作-->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+</div>
+</body>
+<script>
+    new Vue({
+        el:"#app",
+        method:"post",
+        data(){
+            return{
+                dialogVisible: false,
+                addForm:{
+                    name:"",
+                    delivery: false,
+                },
+                /*修改时的返回数据*/
+                updateForm: {
+                    name: '',
+                    pwd: '',
+                    nickname: '',
+                    region: '',
+                    available: ''  // 添加是否启用字段
+                },
+                // 添加一个变量区分是添加还是编辑
+                dialogType: 'add', // 'add' 或 'edit'
+                /*批量删除*/
+                ids:[],
+                // 页面中表格显示的内容
+                tableData: [{
+                    name: '王小虎',
+                    id:'1',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 1
+                }, {
+                    name: '王虎',
+                    id:'2',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 0
+                }, {
+                    name: '王大虎',
+                    id:'3',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 1
+                }, {
+                    name: '王小虎',
+                    id:'6',
+                    nickname:"admin",
+                    role:"管理员",
+                    available: 1
+                }],
+            }
+
+        },
+        methods:{
+            // 添加用户
+            add() {
+                // todo:添加
+                // alert("添加")
+            },
+            updateRole(){
+                // console.log(this.updateForm.available)
+                // todo：修改
+            },
+            // 批量删除
+            deletebyIds(){
+                //todo:根据
+            },
+            // 关闭按钮
+            handleClose(done) {
+                done();
+            },
+            /*todo:单个删除*/
+            handleDelete(index,row){
+                console.log(row.id)
+            },
+            // 处理编辑按钮点击时显示的内容
+            handleEdit(row) {
+                this.dialogType = 'edit';
+                this.dialogVisible = true;
+                // 复制数据到编辑表单
+                this.updateForm = {
+                    nickname: row.nickname,
+                    delivery: row.delivery || false,
+                    available: row.available // 添加状态字段
+                };
+            },
+
+            // 处理开关状态变化
+            handleSwitchChange(val) {
+                this.updateForm.available = val ? 1 : 0;
+            },
+            // 表格多选框选中事件
+            handleSelectionChange(val) {
+                // todo
+                this.multipleSelection = val;
+            },
+            // 单选
+            handleSelect(selection, row) {
+                this.multipleSelection = selection;
+                this.ids = this.multipleSelection.map(item => item.name);
+                // todo
+                console.log(this.ids)
+            },
+            // 统一处理表单提交
+            handleSubmit() {
+                this.$refs.updateForm.validate((valid) => {
+                    if (valid) {
+                        if (this.dialogType === 'add') {
+                            // 处理添加
+                            this.add();
+                        } else {
+                            // 处理更新
+                            this.updateRole();
+                        }
+                    }
+                });
+            },
+
+            // 全选
+            handleSelectAll(selection) {
+                this.multipleSelection = selection;
+                this.names = this.multipleSelection.map(item => item.name);
+                console.log(this.names)
+            },
+        }
+
+    })
+</script>
+</html>

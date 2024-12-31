@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .register-form {
+            width: 400px;
+            padding: 30px;
+            margin: 0 auto;
+        }
+        .password-input {
+            position: relative;
+        }
+        .password-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            color: #909399;
+        }
+        .login-link {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .login-link a {
+            color: #409EFF;
+            text-decoration: none;
+        }
+        .divider {
+            margin: 20px 0;
+            border-top: 1px solid #EBEEF5;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-form
+            ref="registerForm"
+            :model="registerForm"
+            :rules="rules"
+            label-width="100px"
+            class="register-form">
+
+        <el-form-item label="用户名" prop="username">
+            <el-input
+                    v-model="registerForm.username"
+                    placeholder="请输入用户名">
+            </el-input>
+        </el-form-item>
+
+        <el-form-item label="密码" prop="password">
+            <div class="password-input">
+                <el-input
+                        v-model="registerForm.password"
+                        :type="passwordType"
+                        placeholder="请输入密码">
+                </el-input>
+                <i
+                        :class="['password-icon', passwordIcon]"
+                        @click="togglePasswordVisibility('password')">
+                </i>
+            </div>
+        </el-form-item>
+
+        <el-form-item label="确认密码" prop="confirmPassword">
+            <div class="password-input">
+                <el-input
+                        v-model="registerForm.confirmPassword"
+                        :type="confirmPasswordType"
+                        placeholder="请确认密码">
+                </el-input>
+                <i
+                        :class="['password-icon', confirmPasswordIcon]"
+                        @click="togglePasswordVisibility('confirm')">
+                </i>
+            </div>
+        </el-form-item>
+
+        <div class="divider"></div>
+
+        <div class="login-link">
+            <a href="login.html">已有账号？立即登录</a>
+        </div>
+    </el-form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            // 密码确认验证
+            const validateConfirmPassword = (rule, value, callback) => {
+                if (value !== this.registerForm.password) {
+                    callback(new Error('两次输入的密码不一致'));
+                } else {
+                    callback();
+                }
+            };
+
+            return {
+                registerForm: {
+                    username: '',
+                    password: '',
+                    confirmPassword: ''
+                },
+                passwordType: 'password',
+                confirmPasswordType: 'password',
+                rules: {
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' },
+                        { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入密码', trigger: 'blur' },
+                        { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+                    ],
+                    confirmPassword: [
+                        { required: true, message: '请确认密码', trigger: 'blur' },
+                        { validator: validateConfirmPassword, trigger: 'blur' }
+                    ]
+                }
+            }
+        },
+        computed: {
+            passwordIcon() {
+                return this.passwordType === 'password' ?
+                    'el-icon-view' : 'el-icon-hide';
+            },
+            confirmPasswordIcon() {
+                return this.confirmPasswordType === 'password' ?
+                    'el-icon-view' : 'el-icon-hide';
+            }
+        },
+        methods: {
+            // 切换密码显示/隐藏
+            togglePasswordVisibility(field) {
+                if (field === 'password') {
+                    this.passwordType = this.passwordType === 'password' ?
+                        'text' : 'password';
+                } else {
+                    this.confirmPasswordType = this.confirmPasswordType === 'password' ?
+                        'text' : 'password';
+                }
+            },
+
+            // 提交表单
+            submitForm() {
+                this.$refs.registerForm.validate((valid) => {
+                    if (valid) {
+                        // 这里添加注册逻辑
+                        console.log('submit form:', this.registerForm);
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+            // 重置表单
+            resetForm() {
+                this.$refs.registerForm.resetFields();
+            }
+        }
+    });
+</script>
+</body>
+</html>

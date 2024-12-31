@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>编辑公告</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="js/index.js"></script>
+    <style>
+        .notice-container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .top-row {
+            display: flex;
+            align-items: center; /* 确保垂直对齐 */
+            margin-bottom: 20px;
+        }
+        .visibility-select {
+            margin-right: 20px; /* 添加右边距 */
+        }
+        .content-row {
+            margin-top: 20px;
+        }
+        /* 移除表单项的底部边距 */
+        .no-bottom-margin .el-form-item {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="notice-container">
+        <!-- 标题和关闭按钮 -->
+        <div class="header">
+            <div class="title">编辑公告</div>
+            <el-button type="text" @click="handleClose">
+                <i class="el-icon-close"></i>
+            </el-button>
+        </div>
+
+        <!-- 修改表单部分 -->
+        <el-form :model="noticeForm" ref="noticeForm" label-width="80px">
+            <!-- 公开度和上传按钮 -->
+            <div class="top-row no-bottom-margin">
+                <div class="visibility-select">
+                    <el-form-item label="公开度">
+                        <el-select
+                                v-model="noticeForm.visibility"
+                                placeholder="请选择"
+                                style="width: 200px"
+                                :disabled="isView">
+                            <el-option label="保存草稿" value="draft"></el-option>
+                            <el-option label="教师可见" value="teacher"></el-option>
+                            <el-option label="全体可见" value="all"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </div>
+
+                <el-button
+                        type="primary"
+                        icon="el-icon-position"
+                        :disabled="isView">
+                    上传附件
+                </el-button>
+            </div>
+
+            <!-- 标题和发布人 -->
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <el-form-item label="公告标题">
+                        <el-input
+                                v-model="noticeForm.title"
+                                placeholder="请输入公告标题"
+                                :readonly="isView">
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="发布人">
+                        <el-input
+                                v-model="noticeForm.publisher"
+                                placeholder="请输入发布人"
+                                :readonly="isView">
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <!-- 公告内容 -->
+            <div class="content-row">
+                <el-form-item label="公告内容">
+                    <el-input
+                            type="textarea"
+                            v-model="noticeForm.content"
+                            :rows="10"
+                            placeholder="请输入公告内容"
+                            :readonly="isView">
+                    </el-input>
+                </el-form-item>
+            </div>
+
+            <!-- 添加底部按钮 -->
+            <el-form-item v-if="!isView">
+                <el-button type="primary" @click="handleSave">保存</el-button>
+                <el-button @click="handleClose">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                noticeForm: {
+                    visibility: '',
+                    title: '',
+                    publisher: '',
+                    content: ''
+                }
+            }
+        },
+        methods: {
+            handleClose() {
+                this.$confirm('确认关闭？未保存的内容将会丢失', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    console.log('关闭窗口');
+                    location.href = 'notifFcation.html'
+                }).catch(() => {
+                    // 取消关闭
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>
