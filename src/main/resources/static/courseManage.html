@@ -49,7 +49,7 @@
             <el-table-column
                     label="课程编号"
                     sortable
-                    width="150">
+                    width="100">
                 <template slot-scope="scope">
                     <span style="margin-left: 10px">{{ scope.row.id }}</span>
                 </template>
@@ -57,7 +57,7 @@
             <!--课程名称-->
             <el-table-column
                     label="课程名称"
-                    width="120">
+                    width="100">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
                         <p>课程名称: {{ scope.row.coursename }}</p>
@@ -70,7 +70,7 @@
             <!--任课教师-->
             <el-table-column
                     label="任课教师"
-                    width="120">
+                    width="100">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
                         <p>任课教师: {{ scope.row.synopsis }}</p>

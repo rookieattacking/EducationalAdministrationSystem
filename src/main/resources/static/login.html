@@ -39,14 +39,16 @@
             color: #409EFF;
             font-size: 25px;
         }
+        .captcha-img {
+            height: 40px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
         .captcha-container {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        .captcha-img {
-            height: 40px;
-            cursor: pointer;
         }
         .register-link {
             text-align: right;
@@ -74,6 +76,7 @@
             <div class="title">
                 <h1>教务管理系统</h1>
             </div>
+
             <el-form :model="loginForm" :rules="rules" ref="loginForm">
                 <el-form-item prop="username">
                     <el-input
@@ -152,23 +155,22 @@
 </div>
 
 <script src="js/Vue.main.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="js/index.js"></script>
 <script src="js/axios.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
 <script>
+    // 密码确认验证
+    const validateConfirmPassword = (rule, value, callback) => {
+        if (value !== this.registerForm.password) {
+            callback(new Error('两次输入的密码不一致'));
+        } else {
+            callback();
+        }
+    };
     new Vue({
         el: '#app',
         data() {
-            // 密码确认验证
-            const validateConfirmPassword = (rule, value, callback) => {
-                if (value !== this.registerForm.password) {
-                    callback(new Error('两次输入的密码不一致'));
-                } else {
-                    callback();
-                }
-            };
-
             return {
                 loginForm: {
                     username: '',
@@ -181,7 +183,7 @@
                     password: '',
                     confirmPassword: ''
                 },
-                captchaUrl: '/validatecode',
+                captchaUrl: 'http://localhost:8080/code',
                 registerVisible: false,
                 rules: {
                     username: [
@@ -205,35 +207,33 @@
                         { required: true, message: '请确认密码', trigger: 'blur' },
                         { validator: validateConfirmPassword, trigger: 'blur' }
                     ]
-                }
+                },
+
             }
         },
         mounted() {
             this.initParticles();
+            this.refreshCaptcha();
         },
         methods: {
-            // 刷新验证码
             refreshCaptcha() {
-                this.captchaUrl = `/validatecode?t=${new Date().getTime()}`;
+                // 方式一：使用后端接口（推荐）
+                this.captchaUrl = `http://localhost:8080/code?t=${new Date().getTime()}`;
             },
-
             // 处理登录
             handleLogin() {
-                this.$refs.loginForm.validate(async (valid) => {
+                this.$refs.loginForm.validate((valid) => {
                     if (valid) {
-                        try {
-                            const response = await axios.post('/easLogin/login', this.loginForm);
-                            if (response.data.code === 0) {
-                                this.$message.success('登录成功');
-                                window.location.href = '/easLogin/main';
-                            } else {
-                                this.$message.error(response.data.msg);
-                                this.refreshCaptcha();
+                        axios({
+                            url: 'http://localhost:8080/admin/login',
+                            method: 'post',
+                            data: {
+                                username: this.loginForm.username,
+                                password: this.loginForm.password,
                             }
-                        } catch (error) {
-                            this.$message.error('登录失败，请稍后重试');
-                            console.error('Login error:', error);
-                        }
+                        }).then(res => {
+                            console.log(res)
+                        })
                     }
                 });
             },
@@ -245,21 +245,18 @@
 
             // 处理注册
             handleRegister() {
-                this.$refs.registerForm.validate(async (valid) => {
+                // todo: 要像上面要验证表单才能发送成功请求
+                this.$refs.loginForm.validate((valid) => {
                     if (valid) {
-                        try {
-                            const response = await axios.post('/easRegister/registerUser', this.registerForm);
-                            if (response.data.code === 0) {
-                                this.$message.success('注册成功');
-                                this.registerVisible = false;
-                                this.resetRegisterForm();
-                            } else {
-                                this.$message.error(response.data.msg);
+                        axios({
+                            url: '',
+                            method: 'post',
+                            data: {
+
                             }
-                        } catch (error) {
-                            this.$message.error('注册失败，请稍后重试');
-                            console.error('Register error:', error);
-                        }
+                        }).then(res => {
+                            console.log(res)
+                        })
                     }
                 });
             },
