@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>教务管理系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #app {
+            height: 100%;
+        }
+
+        .el-container {
+            height: 100%;
+        }
+
+        /* 头部样式优化 */
+        .el-header {
+            background: #2b3a4a;
+            padding: 0;
+            height: 56px !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,.08);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .header-logo {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 0 20px;
+            font-size: 14px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .header-nav a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .header-nav a i {
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .el-dropdown-link {
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 56px;
+        }
+
+        .el-dropdown-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* 侧边栏样式优化 */
+        .el-aside {
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            transition: all 0.3s;
+            overflow-x: hidden; /* 添加此行 */
+            overflow-y: auto; /* 添加此行 */
+            height: 100%; /* 添加此行 */
+        }
+
+        .el-menu {
+            border-right: none;
+        }
+
+        .el-submenu__title {
+            font-size: 14px;
+            height: 50px;
+            line-height: 50px;
+        }
+
+        .el-menu-item {
+            font-size: 14px;
+            height: 40px;
+            line-height: 40px;
+            margin: 4px 0;
+        }
+
+        .el-menu-item.is-active {
+            background-color: #e6f7ff !important;
+            color: #1890ff !important;
+            border-right: 3px solid #1890ff;
+        }
+
+        .el-menu-item:hover {
+            background-color: #f5f5f5 !important;
+        }
+
+        /* 主内容区域优化 */
+        .el-main {
+            padding: 24px;
+            background: #f0f2f5;
+            overflow-x: hidden; /* 隐藏水平滚动条 */
+        }
+
+        .main-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            flex: 1; /* 添加此行 */
+        }
+
+        /* 页脚样式优化 */
+        .el-footer {
+            flex-shrink: 0; /* 添加此行 */
+        }
+
+        /* 下拉菜单样式优化 */
+        .el-dropdown-menu {
+            border-radius: 4px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+        }
+
+        .el-dropdown-menu__item {
+            font-size: 14px;
+            padding: 8px 20px;
+        }
+
+        .el-dropdown-menu__item a {
+            text-decoration: none;
+            color: #606266;
+            display: block;
+        }
+
+        .el-dropdown-menu__item:hover {
+            background-color: #f5f7fa;
+        }
+
+        .el-dropdown-menu__item i {
+            margin-right: 8px;
+        }
+        /* 添加以下CSS样式 */
+        .el-menu-item a {
+            text-decoration: none;  /* 去掉下划线 */
+            color: #606266;        /* 设置文字颜色 */
+            display: block;        /* 让链接占满整个菜单项 */
+            width: 100%;          /* 宽度100% */
+            height: 100%;         /* 高度100% */
+        }
+
+        .el-menu-item.is-active a {
+            color: #1890ff !important;  /* 选中时的文字颜色 */
+        }
+
+        .el-menu-item:hover a {
+            color: #1890ff;  /* 悬停时的文字颜色 */
+        }
+
+        /* 修改菜单项内边距 */
+        .el-menu-item {
+            padding: 0 !important;  /* 清除默认内边距 */
+        }
+
+        .el-menu-item a {
+            padding: 0 20px;  /* 设置链接的内边距 */
+        }
+        /* 添加容器样式控制 */
+        .el-container {
+            height: 100%;
+            overflow-x: hidden; /* 隐藏容器的水平滚动条 */
+        }
+
+        /* 确保内容区域不会超出容器 */
+        .el-container.is-vertical {
+            flex: 1;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <!-- 头部导航 -->
+        <el-header>
+            <div class="header-inner">
+                <div class="header-logo">教务管理系统</div>
+
+                <ul class="header-nav">
+                    <li>
+                        <a href="home.html" target="mainFrame">
+                            <i class="el-icon-s-home"></i>
+                            主页
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="header-right">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link">
+                            <img src="images/suolong1.jpg" class="user-avatar">
+                            {{ username }}
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item>
+                                <a href="javascript:;" target="mainFrame">
+                                    <i class="el-icon-user"></i>基本资料
+                                </a>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <a href="passwordRest.html" target="mainFrame">
+                                    <i class="el-icon-key"></i>修改密码
+                                </a>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                                <a href="javascript:void(0)" @click="logout">
+                                    <i class="el-icon-switch-button"></i>退出系统
+                                </a>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </div>
+            </div>
+        </el-header>
+
+        <el-container>
+            <!-- 侧边栏导航 -->
+            <el-aside width="210px">
+                <el-menu
+                        :default-active="activeIndex"
+                        @select="handleSelect"
+                        :unique-opened="true">
+
+                    <!-- 信息实管理 -->
+                    <el-submenu index="1">
+                        <template slot="title">
+                            <i class="el-icon-setting"></i>
+                            <span>信息实管理</span>
+                        </template>
+                        <el-menu-item index="1-1">
+                            <a href="studentQuery.html" target="mainFrame">学生信息</a>
+                        </el-menu-item>
+                        <el-menu-item index="1-2">
+                            <a href="courseStudent.html" target="mainFrame">基本课程信息</a>
+                        </el-menu-item>
+                    </el-submenu>
+
+                    <!-- 课程管理 -->
+                    <el-submenu index="2">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>
+                            <span>课程管理</span>
+                        </template>
+                        <el-menu-item index="2-1">
+                            <a href="courseStudentInfo.html" target="mainFrame">课程信息(学生)</a>
+                        </el-menu-item>
+                    </el-submenu>
+
+
+                    <!-- 成绩管理 -->
+                    <el-submenu index="3">
+                        <template slot="title">
+                            <i class="el-icon-reading"></i>
+                            <span>成绩管理</span>
+                        </template>
+                        <el-menu-item index="3-1">
+                            <a href="myCourse.html" target="mainFrame">我的成绩</a>
+                        </el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-aside>
+            <!-- 主要内容区域 -->
+            <el-main>
+                <iframe name="mainFrame" src="home.html" class="main-iframe"></iframe>
+            </el-main>
+        </el-container>
+
+        <!-- 页脚 -->
+        <!--        <el-footer>-->
+        <!--            © www.zhangqingeas.online - 底部固定区域-->
+        <!--        </el-footer>-->
+    </el-container>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                username: '学生登录时的名字',
+                activeIndex: '1-1',  // 默认选中第一个菜单项
+                menuUrlMap: {
+                    '1-1': 'studentQuery.html',
+                    '1-2': 'courseStudent.html',
+                    '2-1': 'courseStudentInfo.html',
+                    '3-1': 'myCourse.html',
+                }
+            }
+        },
+        methods: {
+            handleSelect(key, keyPath) {
+                this.activeIndex = key;
+            },
+            logout() {
+                this.$confirm('确定要退出吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    window.location.href = 'login.html';
+                }).catch(() => {})
+            }
+        }
+    })
+</script>
+</body>
+</html>
