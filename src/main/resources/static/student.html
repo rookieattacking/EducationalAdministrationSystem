@@ -12,23 +12,6 @@
 </head>
 <body>
 <div id="app">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="姓名">
-            <el-input v-model="formInline.name" placeholder=""></el-input>
-        </el-form-item>
-        <el-form-item label="电话">
-            <el-input v-model="formInline.phone" placeholder=""></el-input>
-        </el-form-item>
-        <el-form-item label="班级">
-            <el-select v-model="formInline.region" placeholder="请选择">
-                <el-option label="计算机科学与技术17_2" value="计算机科学与技术17_2"></el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
-        </el-form-item>
-    </el-form>
-
     <!--表格-->
     <template>
         <el-table

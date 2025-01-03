@@ -57,18 +57,12 @@
             <el-form-item label="加密盐值">
                 <el-input v-model="updateForm.nickname"></el-input>
             </el-form-item>
-            <el-form-item label="是否锁定">
-                <el-switch
-                    v-model="updateForm.available"
-                    :active-value="1"
-                    :inactive-value="0"
-                    @change="handleSwitchChange">
-            </el-switch>
             </el-form-item>
             <el-form-item label="用户角色">
                 <el-select v-model="updateForm.region" placeholder="请选择角色">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
+                    <el-option label="管理员" value="管理员"></el-option>
+                    <el-option label="学生" value="学生"></el-option>
+                    <el-option label="老师" value="老师"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -116,7 +110,7 @@
 
             <!--盐值-->
             <el-table-column
-                    label="盐值"
+                    label="别名"
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
@@ -128,21 +122,6 @@
                 </template>
             </el-table-column>
 
-            <!--是否锁定-->
-            <el-table-column
-                    label="是否锁定"
-                    width="100">
-                <template slot-scope="scope">
-                    <el-switch
-                            v-model="scope.row.available"
-                            @change="handleStatusChange(scope.row)"
-                            :active-value="1"
-                            :inactive-value="0"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949">
-                    </el-switch>
-                </template>
-            </el-table-column>
 
             <!--所属角色-->
             <el-table-column
@@ -158,16 +137,6 @@
                 </template>
             </el-table-column>
 
-
-            <!--注册日期-->
-            <el-table-column
-                    label="注册日期"
-                    width="180">
-                <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
-                </template>
-            </el-table-column>
             <!--操作-->
             <el-table-column label="操作">
                 <template slot-scope="scope">
@@ -257,6 +226,18 @@
             }
         },
         methods: {
+            getAll(){
+                axios({
+                    url:'http://localhost:8080/user/getUserAll',
+                    method:'post',
+                    data:{
+
+                    }
+                }).then(res =>{
+                    console.log(res)
+
+                })
+            },
             // 模糊查询
             onSubmit() {
                 //todo:模糊查询
@@ -340,6 +321,9 @@
                 // todo:根据id删除
                 console.log(row.id)
             },
+        },
+        mounted() {
+            this.getAll();
         }
     })
 </script>
