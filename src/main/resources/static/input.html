@@ -15,20 +15,6 @@
             max-width: 1200px;
         }
 
-        .close-btn {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 20px;
-            cursor: pointer;
-            color: #909399;
-            z-index: 1000;
-        }
-
-        .close-btn:hover {
-            color: #409EFF;
-        }
-
         .select-container {
             margin: 20px 0;
             text-align: center;
@@ -39,12 +25,19 @@
             height: 400px;
             margin: 20px auto;
         }
+
+        /* 添加过渡效果 */
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
 <div id="app">
     <div class="report-container">
-
         <!-- 课程选择 -->
         <div class="select-container">
             <el-form :inline="true">
@@ -64,8 +57,10 @@
             </el-form>
         </div>
 
-        <!-- 图表容器 -->
-        <div id="scoreChart" class="chart-container"></div>
+        <!-- 使用transition和v-show控制图表显示 -->
+        <transition name="fade">
+            <div v-show="showChart" id="scoreChart" class="chart-container"></div>
+        </transition>
     </div>
 </div>
 
@@ -75,31 +70,32 @@
         data() {
             return {
                 selectedCourse: '',
+                showChart: false,  // 控制图表显示
                 courseOptions: [
                     { value: '1', label: 'C语言程序设计' },
                     { value: '2', label: '数据结构与算法' },
                     { value: '3', label: '操作系统' },
                     { value: '4', label: '计算机网络' },
-                    { value: '5', label: '软件工程' },
-                    // ... 其他课程选项
+                    { value: '5', label: '软件工程' }
                 ],
                 chart: null
             }
         },
-        mounted() {
-            this.initChart();
-        },
         methods: {
             initChart() {
-                this.chart = echarts.init(document.getElementById('scoreChart'));
-                this.updateChart();
+                // 确保DOM元素已经渲染
+                this.$nextTick(() => {
+                    if (!this.chart) {
+                        this.chart = echarts.init(document.getElementById('scoreChart'));
+                    }
+                    this.updateChart();
+                });
             },
 
             updateChart() {
-                // 示例数据，实际应该根据选择的课程从后端获取
                 const option = {
                     title: {
-                        text: '课程成绩分布'
+                        text: this.getSelectedCourseName() + '成绩分布'
                     },
                     tooltip: {
                         trigger: 'axis'
@@ -146,14 +142,29 @@
             },
 
             handleCourseChange(value) {
-                // 这里应该调用后端API获取新的数据
-                console.log('选择的课程:', value);
-                this.updateChart(); // 更新图表数据
+                if (value) {
+                    // 显示图表
+                    this.showChart = true;
+                    // 初始化或更新图表
+                    this.$nextTick(() => {
+                        this.initChart();
+                    });
+
+                    // 这里可以调用后端API获取数据
+                    // axios.get(`/api/scores/${value}`).then(res => {
+                    //     // 处理数据并更新图表
+                    // });
+                } else {
+                    this.showChart = false;
+                }
             },
 
+            getSelectedCourseName() {
+                const course = this.courseOptions.find(item => item.value === this.selectedCourse);
+                return course ? course.label : '';
+            }
         },
         beforeDestroy() {
-            // 销毁图表实例
             if (this.chart) {
                 this.chart.dispose();
             }
