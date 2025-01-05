@@ -6,19 +6,19 @@
     <!-- 引入 Element UI CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <!-- 引入 Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="js/Vue.main.js"></script>
     <!-- 引入 Element UI -->
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/index.js"></script>
     <!-- 引入 axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/axios.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: "microsoft yahei";
-            box-sizing: border-box;
-        }
+        /** {*/
+        /*    margin: auto;*/
+        /*    padding: 0;*/
+        /*    font-family: "microsoft yahei";*/
+        /*    box-sizing: border-box;*/
+        /*}*/
 
         .container {
             background: #f3f3f3;
@@ -41,6 +41,7 @@
             position: relative;
             font-weight: 700;
             padding-bottom: 5px;
+            margin-right: 152px
         }
 
         .main .title h4:before {
@@ -70,6 +71,8 @@
         .main .title p {
             font-size: 16px;
             color: #999;
+            margin-right: 149px;
+
         }
 
         .news-item {
@@ -78,7 +81,7 @@
         }
 
         .news-item a {
-            width: 100%;
+            width: 80%;
             height: 220px;
             padding: 38px 44px;
             margin-bottom: 10px;
@@ -136,6 +139,30 @@
         .news-item a:hover {
             box-shadow: 0 1px 10px 0 rgba(0, 0, 0, .1);
         }
+        .loading-more {
+            text-align: center;
+            margin: 20px 0;
+            color: #909399;
+        }
+
+        .news-date {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .news-author {
+            color: #666;
+            margin-right: 15px;
+        }
+
+        /* 添加过渡动画 */
+        .news-fade-enter-active, .news-fade-leave-active {
+            transition: all 0.3s;
+        }
+        .news-fade-enter, .news-fade-leave-to {
+            opacity: 0;
+            transform: translateY(30px);
+        }
     </style>
 </head>
 <body>
@@ -147,23 +174,41 @@
                 <p>News</p>
             </div>
 
-            <div class="news-item" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
-                <a v-for="item in newsList" :key="item.id" :href="'notice/detail.html?id=' + item.id">
-                    <div class="top">
-                        <h5>{{ item.title }}</h5>
-                        <div class="p">
-                            <p>{{ item.author }}</p>
+            <div class="news-item">
+                <transition-group name="news-fade">
+                    <a v-for="item in newsList"
+                       :key="item.id"
+                       :href="'noticeInfo.html?id=' + item.id">
+                        <div class="top">
+                            <h5>{{ item.title }}</h5>
+                            <div class="p">
+                                <p>
+                                    <span class="news-author">{{ item.author }}</span>
+                                    <span class="news-date">{{ formatDate(item.releasedate) }}</span>
+                                </p>
+                            </div>
+                            <img src="/images/new-jiantou.jpg">
                         </div>
-                        <img src="images/new-jiantou.jpg">
-                    </div>
-                    <div class="bottom">
-                        <h3>{{ item.releasedate }}</h3>
-                    </div>
-                </a>
-            </div>
+                        <div class="bottom">
+                            <h3>{{ formatDate(item.releasedate) }}</h3>
+                        </div>
+                    </a>
+                </transition-group>
 
-            <div class="loading" v-if="loading">
-                <el-loading :text="loadingText"></el-loading>
+                <!-- 加载更多 -->
+                <div class="loading-more" v-if="!loading && hasMore">
+                    <el-button type="text" @click="loadMore">加载更多</el-button>
+                </div>
+
+                <!-- 加载中 -->
+                <div class="loading-more" v-if="loading">
+                    <el-loading :text="loadingText"></el-loading>
+                </div>
+
+                <!-- 没有更多 -->
+                <div class="loading-more" v-if="!hasMore">
+                    没有更多数据了
+                </div>
             </div>
         </div>
     </div>
@@ -175,7 +220,8 @@
         data() {
             return {
                 newsList: [],
-                page: 1,
+                pageNum: 1,
+                pageSize: 10,
                 loading: false,
                 hasMore: true,
                 loadingText: '加载中...'
@@ -185,28 +231,50 @@
             this.getNoticeList()
         },
         methods: {
-            // async getNoticeList() {
-            //     if (!this.hasMore) return
-            //
-            //     this.loading = true
-            //     try {
-            //         const response = await axios.get(`/api/notice/list?page=${this.page}`)
-            //         const { data, totalPage } = response.data
-            //
-            //         this.newsList = [...this.newsList, ...data]
-            //         this.hasMore = this.page < totalPage
-            //         this.page++
-            //     } catch (error) {
-            //         console.error('获取新闻列表失败:', error)
-            //         this.$message.error('获取新闻列表失败')
-            //     } finally {
-            //         this.loading = false
-            //     }
-            // },
+            getNoticeList() {
+                axios({
+                    url: 'http://localhost:8080/notice/list',
+                    method: 'post',
+                    data:this.id
+                }).then(res => {
+                    console.log(res.data)
+                    this.newsList = res.data.data;
+                    // 判断是否还有更多数据
+                    this.hasMore = this.newsList.length >= this.pageSize;
+                }).catch(error => {
+                    console.error('获取新闻列表失败:', error);
+                    this.$message.error('获取新闻列表失败');
+                })
+            },
+
+            formatDate(date) {
+                if (!date) return ''
+                const d = new Date(date)
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+            },
+
             loadMore() {
-                if (!this.loading) {
-                    this.getNoticeList()
-                }
+                this.pageNum++;
+                this.loading = true;
+                axios({
+                    url: 'http://localhost:8080/notice/list',
+                    method: 'post',
+                    data: {
+                        pageNum: this.pageNum,
+                        pageSize: this.pageSize
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        const newData = res.data.data;
+                        this.newsList = [...this.newsList, ...newData];
+                        this.hasMore = newData.length >= this.pageSize;
+                    }
+                }).catch(error => {
+                    console.error('加载更多失败:', error);
+                    this.$message.error('加载更多失败');
+                }).finally(() => {
+                    this.loading = false;
+                });
             }
         }
     })
