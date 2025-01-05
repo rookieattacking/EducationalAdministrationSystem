@@ -1,10 +1,13 @@
 package org.lanqiao.educationaladministrationsystem.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.lanqiao.educationaladministrationsystem.pojo.EasNotice;
 
 import java.util.List;
 
+@Mapper
 public interface EasNoticeMapper {
     int getCountByType(@Param("type") int type, @Param("searchKey") String searchKey);
 
@@ -22,5 +25,12 @@ public interface EasNoticeMapper {
 
     // List<EasNotice> getNoticeListByTypeAndEasNotice(@Param("type") int type,@Param("easNotice") EasNotice easNotice,@Param("pageUtil") PageUtil pageUtil);
 
-    List<EasNotice> getNoticeById(Integer id);
+
+
+    List<EasNotice> getNoticeById(Long id);
+
+
+    /* 获取所有的通知 */
+    @Select("select * from eas_notice")
+    List<EasNotice> getAllList();
 }

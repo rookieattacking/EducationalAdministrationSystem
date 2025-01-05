@@ -12,13 +12,14 @@
     <script src="js/Vue.main.js"></script>
     <!-- 引入 Element UI -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/axios.js"></script>
 </head>
 
 <body>
 <div id="app">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="">
-            <el-input v-model="formInline.user" placeholder="请输入搜索的内容"></el-input>
+            <el-input v-model="formInline.title" placeholder="请输入搜索标题的内容"></el-input>
         </el-form-item>
         <el-form-item>
             <el-button type="success" @click="onSubmit">查询</el-button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -111,8 +112,7 @@
         data(){
             return{
                 formInline: {
-                    user: '',
-                    region: ''
+                    title: '',
                 },
                 //
                 isView: false, // 是否是查看模式
@@ -123,34 +123,21 @@
                     content: ''
                 },
                 ids:[],
-                tableData: [{
-                    id:"1",
-                    date: '2016-05-02',
-                    title:"毕业通知",
-                    author:"管理员",
-                    type:1,
-                }, {
-                    id:"2",
-                    date: '2016-05-04',
-                    title:"2018年运动会",
-                    author:"管理员",
-                    type:1,
-                }, {
-                    id:"3",
-                    date: '2016-05-01',
-                    title:"hello",
-                    author:"管理员",
-                    type:2,
-                }, {
-                    id:"6",
-                    date: '2016-05-03',
-                    title:"hello2",
-                    author:"管理员",
-                    type:3,
-                }]
+                tableData: []
             }
         },
         methods:{
+            queryAll(){
+                axios({
+                    url: 'http://localhost:8080/notice/list',
+                    method: 'post',
+                    data:this.id,
+                }).then(res => {
+                    this.tableData = res.data.data;
+                }).catch(error => {
+
+                })
+            },
             onSubmit() {
                 // todo:模糊查询
                 // console.log(this.formInline.user)
@@ -165,8 +152,7 @@
             },
             // 查看公告
             handleView(row) {
-                // todo
-                // location.href = 'node.html';
+                location.href = `noticeInfo.html?id=${row.id}`;
             },
             // 编辑公告
             handleEdit(row) {
@@ -206,6 +192,10 @@
                         return '草稿'
                 }
             },
+
+        },
+        mounted(){
+            this.queryAll();
         }
     })
 </script>
