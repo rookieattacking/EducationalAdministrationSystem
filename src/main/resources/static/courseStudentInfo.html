@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="js/Vue.main.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="课程名称">
+            <el-input v-model="formInline.coursename" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+
+
+    <!--表格-->
+    <template>
+        <el-table
+                ref="table"
+                :data="tableData"
+                @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll"
+                @select="handleSelect"
+                style="width: 100%">
+            <!--id-->
+            <el-table-column
+                    label="课程编号"
+                    sortable
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <!--课程名称-->
+            <el-table-column
+                    label="课程名称"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>课程名称: {{ scope.row.coursename }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.coursename }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <!--任课教师-->
+            <el-table-column
+                    label="任课教师"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>任课教师: {{ scope.row.synopsis }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.teacher }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <!--开始时间 -->
+            <el-table-column
+                    label="开始时间"
+                    width="180">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.startDate }}</span>
+                </template>
+            </el-table-column>
+            <!--结束时间-->
+            <el-table-column
+                    label="结束时间"
+                    width="180">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.endDate }}</span>
+                </template>
+            </el-table-column>
+
+            <!--课时-->
+            <el-table-column
+                    label="课时"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>课时: {{ scope.row.classHours }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.classHours }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+            <!--考核方式-->
+            <el-table-column
+                    label="考核方式"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-popover trigger="hover" placement="top">
+                        <p>考核方式: {{ scope.row.testMode }}</p>
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.testMode }}</el-tag>
+                        </div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+
+        </el-table>
+    </template>
+    <!--分页-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[10, 15, 20, 25]"
+            :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+</div>
+</body>
+<script>
+    new Vue({
+        el:"#app",
+        method:"post",
+        data(){
+            return{
+                formInline: {
+                    coursename: '',
+                    teachername: ''
+                },
+                // ... 其他数据
+                multipleSelection: [], // 存储选中的行
+                // 添加一个变量区分是添加还是编辑
+                dialogType: 'add', // 'add' 或 'edit'
+                // 关闭按钮
+                handleClose(done) {
+                    done();
+                },
+                tableData: [{
+                    id:'1',
+                    coursename: '王小虎',
+                    testMode:"",
+                    studentNum:"",
+                    synopsis:"admin",
+                    startDate: '2016-05-02',
+                    endDate: '2016-05-02',
+                    choiceNum:'',
+                }, {
+                    id:'2',
+                    coursename: '王虎',
+                    synopsis:"admin",
+                    startDate: '2016-05-02',
+                    endDate: '2016-05-02',
+                    testMode:"",
+                    studentNum:"",
+                    choiceNum:'',
+                }, {
+                    id:'3',
+                    coursename: '王大虎',
+                    synopsis:"admin",
+                    startDate: '2016-05-02',
+                    endDate: '2016-05-02',
+                    testMode:"",
+                    studentNum:"",
+                    choiceNum:'',
+                }, {
+                    id:'6',
+                    coursename: '王小虎',
+                    synopsis:"admin",
+                    startDate: '2016-05-02',
+                    endDate: '2016-05-02',
+                    testMode:"",
+                    studentNum:"",
+                    choiceNum:'',
+                }],
+            }
+        },
+        methods:{
+            onSubmit() {
+                console.log('submit!');
+            }
+        }
+    })
+</script>
+</html>
