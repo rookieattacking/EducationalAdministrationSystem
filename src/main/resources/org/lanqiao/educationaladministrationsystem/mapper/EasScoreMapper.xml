@@ -12,9 +12,6 @@
     <resultMap id="BaseResultMap" type="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
         <result column="start_date"  property="startDate" />
         <result column="end_date" property="endDate"/>
-
-        <!--<result column="coursename"  property="courseName" />-->
-        <!--<result column="teacherName"  property="teacherName" />-->
         <result column="test_mode"  property="testMode" />
     </resultMap>
 
