@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EasTeacher {
-
   private long id;
-  private String username;
-  private String name;
-  private String sex;
-  private String birthday;
-  private String phone;
-  private String education;
-  private String motto;
+  private String username;  //用户名
+  private String name;     //老师的姓名
+  private String sex;      //性别
+  private String birthday;    //出生日期
+  private String phone;     //电话
+  private String education;   //学历
+  private String motto;      //座右铭
 
 }

@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.lanqiao.educationaladministrationsystem.mapper.EasTeacherMapper">
 
+<!--    resultMap节点-->
     <resultMap id="resTeacher" type="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
         <!-- property指实体类 -->
         <id property="id" column="id"/>
@@ -12,15 +13,11 @@
         <result property="phone" column="phone"/>
         <result property="education" column="education"/>
         <result property="motto" column="motto"/>
-        <!--<association property="user" javaType="org.lanqiao.educationaladministrationsystem.pojo.EasUser">-->
-        <!--    <id property="id" column="id"/>-->
-        <!--    <result property="username" column="username"/>-->
-        <!--</association>-->
     </resultMap>
-    <insert id="addUsername">
-        insert into eas_teacher(username)
-          values (#{username})
-    </insert>
+
+
+
+<!--    update节点-->
     <update id="updateTeacher">
         update eas_teacher
         <set>
@@ -33,50 +30,74 @@
         </set>
         where username=#{username}
     </update>
+
     <delete id="deleteTeacher">
         delete from eas_teacher
         <where>
-            <if test="username != null and username != ''">
-                username = #{username}
+            <if test="id != 0">
+                id = #{id}
             </if>
         </where>
     </delete>
 
-    <select id="findTeacherList" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher" resultMap="resTeacher">
-        SELECT t.id,u.username,t.name,t.sex,t.birthday,t.phone,t.education,t.motto
-        FROM  eas_teacher as t
-        inner join eas_user as u on t.username = u.username
 
+<!--    模糊查询-->
+    <select id="findTeacherByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
+        select * from eas_teacher
         <where>
-            <if test="name != null and name != ''">
-                and name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+            <if test="name != null and name != '' ">
+                name like concat('%',#{name},'%')
             </if>
-            <if test="phone != null and phone !=''">
-                and phone like CONCAT('%',#{phone,jdbcType=VARCHAR},'%')
-            </if>
-            <if test="education != null and education !=''">
-                and education like CONCAT('%',#{education,jdbcType=VARCHAR},'%')
+            <if test="education != null and education != ''">
+                and education like concat('%',#{education},'%')
             </if>
         </where>
-        order by id ASC;
     </select>
-    <select id="findListByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
-        select * from eas_teacher
-        where username = #{username,jdbcType=VARCHAR}
-    </select>
-    <select id="getTeacherByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
-        select * from eas_teacher
-        where username = #{username,jdbcType=VARCHAR}
-    </select>
-    <select id="getAll" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
-        select * from eas_teacher
-    </select>
-    <select id="findTeacherByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
-        select * from eas_teacher where username = #{username,jdbcType=VARCHAR}
-    </select>
-    <select id="getTotal" resultType="java.lang.Integer">
+
+    <!--分页查询总页数-->
+    <select id="getCount" resultType="java.lang.Integer">
         select count(*) from eas_teacher
     </select>
 
+
+    <!--分页查询-->
+    <select id="selectByPage" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
+        select * from eas_teacher
+            limit #{offSet},#{pageSize}
+    </select>
+
+
+    <!--分页查询模糊查询-->
+    <select id="BigPageList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
+        select * from eas_teacher
+        <where>
+            <if test="teacherPageList.name != null and teacherPageList.name != '' ">
+                name like concat('%',#{teacherPageList.name},'%')
+            </if>
+            <if test="teacherPageList.education != null and teacherPageList.education != ''">
+                and education like concat('%',#{teacherPageList.education},'%')
+            </if>
+        </where>
+        LIMIT #{offSet}, #{teacherPageList.pageSize}
+    </select>
+
+
+<!-- //查询总记录数-->
+    <select id="selectTotal" resultType="java.lang.Integer">
+        select count(*) from eas_teacher
+    </select>
+
+    <!--分页模糊查询的总数-->
+    <select id="teacherCount" resultType="java.lang.Integer">
+        select count(*) from eas_teacher
+        <where>
+            <if test="teacherPageList.name != null and teacherPageList.name != '' ">
+                name like concat('%',#{teacherPageList.name},'%')
+            </if>
+            <if test="teacherPageList.education != null and teacherPageList.education != ''">
+                and education like concat('%',#{teacherPageList.education},'%')
+            </if>
+        </where>
+    </select>
 
 </mapper>
