@@ -8,10 +8,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EasUserRole {
+  private Integer id;
+  private Integer easUserId;
+  private Integer easRoleId;
 
-  private long id;
-  private long easUserId;
-  private long easRoleId;
-
-
+  public EasUserRole(Integer easUserId, Integer easRoleId) {
+    this.easUserId = easUserId;
+    this.easRoleId = easRoleId;
+  }
 }

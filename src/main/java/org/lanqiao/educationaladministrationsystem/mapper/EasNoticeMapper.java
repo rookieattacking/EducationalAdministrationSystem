@@ -17,7 +17,7 @@ public interface EasNoticeMapper {
 
     int updateNotice(EasNotice easNotice);
 
-    int deleteNotice(EasNotice easNotice);
+    int deleteNotice(@Param("id") long id);
 
     int deleteNoticeList(List<Integer> list);
 
@@ -26,11 +26,14 @@ public interface EasNoticeMapper {
     // List<EasNotice> getNoticeListByTypeAndEasNotice(@Param("type") int type,@Param("easNotice") EasNotice easNotice,@Param("pageUtil") PageUtil pageUtil);
 
 
-
     List<EasNotice> getNoticeById(Long id);
 
 
     /* 获取所有的通知 */
     @Select("select * from eas_notice")
     List<EasNotice> getAllList();
+
+
+    @Select("select * from eas_notice  where  title LIKE CONCAT('%', #{title}, '%')")
+    List<EasNotice> like(@Param("title") String title);
 }

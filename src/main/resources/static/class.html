@@ -5,10 +5,11 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>课程</title>
+    <title>班级</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="js/Vue.main.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/axios.js"></script>
 </head>
 <body>
 <div id="app">
@@ -22,7 +23,7 @@
     </el-form>
     <!--操作按钮-->
     <el-row>
-        <el-button type="success" plain @click="dialogVisible = true" icon="el-icon-edit">添加</el-button>
+        <el-button type="success" plain @click="handleAdd" icon="el-icon-edit">添加</el-button>
         <!--批量删除-->
         <el-button type="danger" plain icon="el-icon-delete" @click="deleteByIds">批量删除</el-button>
     </el-row>
@@ -97,6 +98,17 @@
         </el-table>
     </template>
 
+    <!--分页查询-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageNum"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+
 </div>
 </body>
 <script>
@@ -108,7 +120,10 @@
                 formInline: {
                     classes: '',
                 },
-                // ... 其他数据
+                pageNum: 1,        // 当前页码
+                pageSize: 5,      // 每页显示条数
+                total: 0,          // 总条数
+                // 其他数据
                 multipleSelection: [], // 存储选中的行
                 dialogVisible: false,
                 /*批量删除*/
@@ -116,43 +131,149 @@
                 /*修改时的返回数据*/
                 form: {
                     classes: '',
+                    id:'',
                 },
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
-                // 关闭按钮
-                handleClose(done) {
-                    done();
-                },
-                tableData: [{
-                    id:'1',
-                    classes: '王小虎',
-                }, {
-                    id:'2',
-                    classes: '王虎',
-                }, {
-                    id:'3',
-                    classes: '王大虎',
-                }, {
-                    id:'6',
-                    classes: '王小虎',
-                }],
+                tableData: [],
             }
         },
         methods:{
+            // 关闭按钮
+            handleClose(done) {
+                this.form = {
+                    classes: '',
+                    id:'',
+                };
+                this.formInline = {
+                    classes: '',
+                }
+                this.ids =[];
+                this.multipleSelection = [];
+                this.dialogVisible = false;
+                if(done) done();
+            },
+            fetchData() {
+                // 如果有查询条件，使用模糊查询
+                if (this.formInline.classes) {
+                    this.onSubmit();
+                } else {
+                    this.getAll();
+                }
+            },
+            // 处理每页显示条数变化
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.pageNum = 1;  // 重置到第一页
+                this.fetchData();
+            },
+            // 处理页码变化
+            handleCurrentChange(val) {
+                this.pageNum = val;
+                this.fetchData();
+            },
+            /*渲染表格的数据*/
+            getAll(){
+                axios({
+                    url:'http://localhost:8080/class/queryClassAll',
+                    method:'post',
+                    data:{
+                        pageSize: this.pageSize,
+                        pageNum: this.pageNum
+                    }
+                }).then(res =>{
+                    console.log(res.data)
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                    }
+
+                })
+            },
+            // 模糊查询
             onSubmit() {
-                console.log('submit!');
+                this.pageNum = 1;
+                axios({
+                    url:'http://localhost:8080/class/fuzzyClassName',
+                    method:'post',
+                    data:{
+                        classes: this.formInline.classes,
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    },
+                }).then(res =>{
+                    if (res.data.code === 200) {
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                        this.$message.success('查询成功');
+                    } else {
+                        this.$message.error(res.data.msg || '查询失败');
+                    }
+                })
             },
+            /*添加操作*/
             add(){
-              //todo:
-                alert("添加")
+                axios({
+                    url:'http://localhost:8080/class/addClass',
+                    method:'post',
+                    data:this.form,
+                }).then(res =>{
+                    if (res.data.code === 200) {
+                        this.$message.success('添加成功');
+                        this.dialogVisible = false;
+                        this.pageNum = 1;
+                        this.getAll();
+
+                    } else {
+                        this.$message.error(res.data.msg || '添加失败');
+                    }
+                })
+
             },
+            /*修改*/
             updateClasses(){
-                // todo：修改
-                alert("修改")
+                axios({
+                    url:'http://localhost:8080/class/updateClass',
+                    method:'post',
+                    data:this.form,
+                }).then(res =>{
+                    if (res.data.code === 200) {
+                        this.$message.success('修改成功');
+                        this.dialogVisible = false;
+                        this.pageNum = 1;
+                        this.getAll();
+                    } else {
+                        this.$message.error(res.data.msg || '修改失败');
+                    }
+                })
             },
+            /*批量删除*/
             deleteByIds(){
-                /*todo：批量删除*/
-                console.log(this.ids)
+                this.$confirm('确认删除已选中的班级?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url:'http://localhost:8080/class/deleteByIds',
+                        method:'post',
+                        data:this.ids,
+                    }).then(res =>{
+                        if (res.data.code === 200) {
+                            this.$message.success('批量删除成功');
+                            this.dialogVisible = false;
+                            this.pageNum = 1;
+                            this.getAll();
+                        } else {
+                            this.$message.error(res.data.msg || '批量删除失败');
+                        }
+                    })
+                })
+
 
             },
             // 统一处理表单提交
@@ -176,6 +297,17 @@
                 // 复制数据到编辑表单
                 this.form = {
                     classes: row.classes,
+                    id:row.id,
+                };
+            },
+            // 添加按钮点击处理
+            handleAdd() {
+                this.dialogType = 'add';
+                this.dialogVisible = true;
+                // 重置表单数据
+                this.form = {
+                    classes: '',
+                    id:'',
                 };
             },
 
@@ -202,9 +334,32 @@
             },
             // 删除操作(单个删除）
             handleDelete(index, row) {
-                // todo:根据id删除
-                console.log(row.id)
+                this.$confirm('确认删除该班级?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url:'http://localhost:8080/class/deleteById',
+                        method:'post',
+                        data: { id: row.id }
+                    }).then(res =>{
+                        if (res.data.code === 200) {
+                            this.$message.success('删除成功');
+                            this.dialogVisible = false;
+                            this.pageNum = 1;
+                            this.getAll();
+                        } else {
+                            this.$message.error(res.data.msg || '删除失败');
+                        }
+                    })
+                })
+
             },
+        },
+        mounted(){
+            this.getAll();
+
         }
     })
 </script>

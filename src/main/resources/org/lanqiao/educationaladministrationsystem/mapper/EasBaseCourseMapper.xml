@@ -1,69 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.lanqiao.educationaladministrationsystem.mapper.EasBaseCourseMapper">
-    <!--添加基础课程信息-->
-    <insert id="addBaseCourse">
-        insert into eas_base_course(coursename,synopsis)
-          values (#{coursename},#{synopsis})
-    </insert>
 
-    <!--修改基本课程信息-->
-    <update id="updateBaseCourse">
-        update eas_base_course
-        <set>
-            <if test="coursename != null">coursename = #{coursename},</if>
-            <if test="synopsis != null">synopsis = #{synopsis}</if>
-        </set>
-        where id=#{id}
-    </update>
-
-    <!--批量删除根据id-->
-    <delete id="batchDeleteBaseCourse" parameterType="java.lang.reflect.Array">
-        delete from eas_base_course where id in
-        <foreach collection="array" item="id" open="(" close=")" separator=",">
-            #{id}
-        </foreach>
-    </delete>
-
-    <!--查询所有当前表的数据-->
-    <select id="getAll" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
-        select * from eas_base_course
-    </select>
-
-    <!--根据id获取数据集合-->
-    <select id="getListById" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
-        select * from eas_base_course where id = #{id}
-    </select>
-
-    <!--根据id获取单个数据-->
-    <select id="getBaseCourseById" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
-        select * from eas_base_course where id = #{id}
-    </select>
-
-    <!--模糊查询获取集合分页-->
-    <select id="getList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
-        select * from eas_base_course
+    <!--模糊查询总行数-->
+    <select id="getFuzzyCount" resultType="java.lang.Integer">
+        select count(*) from eas_base_course
         <where>
-            <if test="easBaseCourse.coursename != null and easBaseCourse.coursename != ''">
-                and coursename like concat('%',#{easBaseCourse.coursename},'%')
+            <if test="fuzzyQueryCourse.coursename != null and fuzzyQueryCourse.coursename != ''">
+                and coursename like concat('%',#{fuzzyQueryCourse.coursename},'%')
             </if>
-            <if test="easBaseCourse.synopsis != null and easBaseCourse.synopsis != ''">
-                and synopsis like concat('%',#{easBaseCourse.synopsis},'%')
+            <if test="fuzzyQueryCourse.synopsis != null and fuzzyQueryCourse.synopsis != ''">
+                and synopsis like concat('%',#{fuzzyQueryCourse.synopsis},'%')
             </if>
         </where>
-        <!--<if test="pageUtil != null">-->
-        <!--    limit #{pageUtil.pageStart},#{pageUtil.count}-->
-        <!--</if>-->
     </select>
 
-    <!--获得总行数-->
+
+
+
+    <!--获得总行数分页-->
     <select id="getCount" resultType="java.lang.Integer">
         select count(*) from eas_base_course
     </select>
 
 
-    <select id="findBaseCourseName" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
-        select * from eas_base_course where coursename = #{baseCourseName}
+
+    <!--模糊查询获取集合分页-->
+    <select id="getFuzzyList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasBaseCourse.FuzzyQueryCourse">
+        select * from eas_base_course
+        <where>
+            <if test="fuzzyQueryCourse.coursename != null and fuzzyQueryCourse.coursename != ''">
+                and coursename like concat('%',#{fuzzyQueryCourse.coursename},'%')
+            </if>
+            <if test="fuzzyQueryCourse.synopsis != null and fuzzyQueryCourse.synopsis != ''">
+                and synopsis like concat('%',#{fuzzyQueryCourse.synopsis},'%')
+            </if>
+        </where>
+        limit #{offSet},#{fuzzyQueryCourse.pageSize}
     </select>
+
+
+    <!--分页查询-->
+    <select id="getPageList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse">
+        select * from eas_base_course
+        limit #{offSet},#{pageSize}
+    </select>
+
+
+
+    <!--根据id删除单个-->
+    <delete id="deleteById">
+        delete from eas_base_course where id = #{id}
+    </delete>
+
+
+    <!--修改基本课程信息-->
+    <update id="updateBaseCourse">
+        update eas_base_course
+        <set>
+            <if test="coursename != null"> coursename = #{coursename},</if>
+            <if test="synopsis != null"> synopsis = #{synopsis}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+    <!--添加基础课程信息-->
+    <insert id="addBaseCourse">
+        insert into eas_base_course
+        values (null,#{easBaseCourse.coursename},#{easBaseCourse.synopsis})
+    </insert>
+
+
+
+    <!--批量删除根据id-->
+    <delete id="batchDeleteBaseCourse" parameterType="java.lang.reflect.Array">
+        delete from eas_base_course where id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 
 </mapper>

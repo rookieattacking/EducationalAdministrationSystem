@@ -1,13 +1,17 @@
 package org.lanqiao.educationaladministrationsystem.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery;
+import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EaseCourseFuzzyQuery;
 import org.lanqiao.educationaladministrationsystem.pojo.EasCourse;
 
 import java.util.Date;
 import java.util.List;
 
+@Mapper
 public interface EasCourseMapper {
-    int getCount();
+
 
     // List<EasCourse> getList(@Param("easCourse") EasCourse easCourse, @Param("pageUtil") PageUtil pageUtil);
 
@@ -39,4 +43,28 @@ public interface EasCourseMapper {
     int getTotalPass(@Param("baseCourseId") Integer baseCourseId);
 
     int getTotalNoPass(@Param("baseCourseId")Integer baseCourseId);
+
+
+
+
+
+
+
+
+    /* 分页查询计算总行数 */
+    int getCount();
+
+    /* 分页查询 */
+    List<EasCourseQuery> getPageList(@Param("pageNum") int pageNum,
+                                     @Param("pageSize") int pageSize,
+                                     @Param("offSet") int offSet
+    );
+
+    /*模糊查询分页总行数 */
+    int getFuzzyCount(@Param("easeCourseFuzzyQuery") EaseCourseFuzzyQuery easeCourseFuzzyQuery);
+
+
+    /* 模糊查询 */
+    List<EasCourseQuery> getFuzzyPageList(@Param("easeCourseFuzzyQuery")EaseCourseFuzzyQuery easeCourseFuzzyQuery,
+                                          @Param("offSet") int offSet);
 }

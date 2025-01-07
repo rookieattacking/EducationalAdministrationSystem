@@ -288,10 +288,10 @@
                             <span>信息实管理</span>
                         </template>
                         <el-menu-item index="1-1">
-                            <a href="studentQuery.html" target="mainFrame">学生信息</a>
+                            <a href="student.html" target="mainFrame">学生信息</a>
                         </el-menu-item>
                         <el-menu-item index="1-2">
-                            <a href="courseStudent.html" target="mainFrame">基本课程信息</a>
+                            <a href="course.html" target="mainFrame">基本课程信息</a>
                         </el-menu-item>
                     </el-submenu>
 
@@ -305,18 +305,6 @@
                             <a href="courseStudentInfo.html" target="mainFrame">课程信息(学生)</a>
                         </el-menu-item>
                     </el-submenu>
-
-
-                    <!-- 成绩管理 -->
-                    <el-submenu index="3">
-                        <template slot="title">
-                            <i class="el-icon-reading"></i>
-                            <span>成绩管理</span>
-                        </template>
-                        <el-menu-item index="3-1">
-                            <a href="myCourse.html" target="mainFrame">我的成绩</a>
-                        </el-menu-item>
-                    </el-submenu>
                 </el-menu>
             </el-aside>
             <!-- 主要内容区域 -->
@@ -325,10 +313,6 @@
             </el-main>
         </el-container>
 
-        <!-- 页脚 -->
-        <!--        <el-footer>-->
-        <!--            © www.zhangqingeas.online - 底部固定区域-->
-        <!--        </el-footer>-->
     </el-container>
 </div>
 
@@ -337,13 +321,12 @@
         el: '#app',
         data() {
             return {
-                username: '学生登录时的名字',
+                username: sessionStorage.getItem('studentName') || '',
                 activeIndex: '1-1',  // 默认选中第一个菜单项
                 menuUrlMap: {
                     '1-1': 'studentQuery.html',
                     '1-2': 'courseStudent.html',
                     '2-1': 'courseStudentInfo.html',
-                    '3-1': 'myCourse.html',
                 }
             }
         },

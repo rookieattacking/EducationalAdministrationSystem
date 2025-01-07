@@ -131,26 +131,41 @@
         </div>
     </div>
 
-    <!-- 注册对话框 -->
+    <!-- 修改注册对话框 -->
     <el-dialog
             title="用户注册"
             :visible.sync="registerVisible"
-            width="500px">
-        <el-form :model="registerForm" :rules="registerRules" ref="registerForm">
-            <el-form-item label="用户名" prop="username">
-                <el-input v-model="registerForm.username"></el-input>
-            </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input type="password" v-model="registerForm.password"></el-input>
-            </el-form-item>
-            <el-form-item label="确认密码" prop="confirmPassword">
-                <el-input type="password" v-model="registerForm.confirmPassword"></el-input>
-            </el-form-item>
-        </el-form>
-        <div slot="footer">
-            <el-button @click="resetRegisterForm">重 置</el-button>
-            <el-button type="primary" @click="handleRegister">注 册</el-button>
-        </div>
+            width="500px"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            :modal-append-to-body="false"
+            @closed="handleDialogClosed">
+    <el-form :model="registerForm"
+             :rules="registerRules"
+             ref="registerForm"
+             @submit.native.prevent>
+        <el-form-item label="用户名" prop="username">
+            <el-input v-model="registerForm.username"
+                      @mousedown.native.stop>
+            </el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+            <el-input type="password"
+                      v-model="registerForm.password"
+                      @mousedown.native.stop>
+            </el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input type="password"
+                      v-model="registerForm.confirmPassword"
+                      @mousedown.native.stop>
+            </el-input>
+        </el-form-item>
+    </el-form>
+    <div slot="footer">
+        <el-button @click="resetRegisterForm">重 置</el-button>
+        <el-button type="primary" @click="handleRegister">注 册</el-button>
+    </div>
     </el-dialog>
 </div>
 
@@ -158,19 +173,20 @@
 <script src="js/index.js"></script>
 <script src="js/axios.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
 <script>
-    // 密码确认验证
-    const validateConfirmPassword = (rule, value, callback) => {
-        if (value !== this.registerForm.password) {
-            callback(new Error('两次输入的密码不一致'));
-        } else {
-            callback();
-        }
-    };
+
     new Vue({
         el: '#app',
+        method:'post',
         data() {
+            // 密码确认验证
+            const validateConfirmPassword = (rule, value, callback) => {
+                if (value !== this.registerForm.password) {
+                    callback(new Error('两次输入的密码不一致'));
+                } else {
+                    callback();
+                }
+            };
             return {
                 loginForm: {
                     username: '',
@@ -216,54 +232,107 @@
             this.refreshCaptcha();
         },
         methods: {
+
+            // 显示注册对话框
+            showRegisterDialog() {
+                this.registerVisible = true;
+                // 确保表单被重置
+                this.$nextTick(() => {
+                    if (this.$refs.registerForm) {
+                        this.$refs.registerForm.resetFields();
+                    }
+                });
+            },
+            // 对话框完全关闭后的处理
+            handleDialogClosed() {
+                this.resetRegisterForm();
+            },
+            // 重置注册表单
+            resetRegisterForm() {
+                if (this.$refs.registerForm) {
+                    this.$refs.registerForm.resetFields();
+                }
+                this.registerForm = {
+                    username: '',
+                    password: '',
+                    confirmPassword: ''
+                };
+            },
             refreshCaptcha() {
                 // 方式一：使用后端接口（推荐）
                 this.captchaUrl = `http://localhost:8080/code?t=${new Date().getTime()}`;
             },
             // 处理登录
             handleLogin() {
-                this.$refs.loginForm.validate((valid) => {
-                    if (valid) {
-                        axios({
-                            url: 'http://localhost:8080/admin/login',
-                            method: 'post',
-                            data: {
-                                username: this.loginForm.username,
-                                password: this.loginForm.password,
-                            }
-                        }).then(res => {
-                            console.log(res)
-                        })
+                axios({
+                    url: 'http://localhost:8080/login',
+                    method: 'post',
+                    data: {
+                        username: this.loginForm.username,
+                        password: this.loginForm.password,
                     }
-                });
+                }).then(res =>{
+                    if(res.data.code == 200){
+                        if(res.data.data == 1){
+                            this.$message.success("登录成功");
+                            location.href = 'index.html';
+                        }else{
+                            this.$message.success("登录成功");
+                            // 使用sessionStorage存储
+                            sessionStorage.setItem('studentName', this.loginForm.username);
+                            location.href = 'Studentindex.html';
+                        }
+                    }else{
+                        this.$message.error("用户不存在");
+                    }
+                })
+
             },
 
-            // 显示注册对话框
-            showRegisterDialog() {
-                this.registerVisible = true;
-            },
 
             // 处理注册
             handleRegister() {
-                // todo: 要像上面要验证表单才能发送成功请求
-                this.$refs.loginForm.validate((valid) => {
+                this.$refs.registerForm.validate((valid) => {
                     if (valid) {
+                        // 再次确认密码是否一致
+                        if (this.registerForm.password !== this.registerForm.confirmPassword) {
+                            this.$message.error('两次输入的密码不一致');
+                            return;
+                        }
+                        // 发送注册请求
                         axios({
-                            url: '',
+                            url: 'http://localhost:8080/register',
                             method: 'post',
                             data: {
-
+                                username: this.registerForm.username,
+                                password: this.registerForm.password
                             }
                         }).then(res => {
-                            console.log(res)
-                        })
+                            if (res.data.code === 200) {
+                                this.$message.success('注册成功');
+                                this.registerVisible = false;
+                                this.handleDialogClosed();
+                            } else {
+                                this.$message.error(res.data.msg || '注册失败');
+                            }
+                        }).catch(error => {
+                            console.error('注册失败:', error);
+                            this.$message.error('注册失败，请稍后重试');
+                        });
                     }
                 });
             },
 
             // 重置注册表单
             resetRegisterForm() {
-                this.$refs.registerForm.resetFields();
+                if (this.$refs.registerForm) {
+                    this.$refs.registerForm.resetFields();
+                }
+                this.registerForm = {
+                    username: '',
+                    password: '',
+                    confirmPassword: ''
+                };
             },
 
             // 初始化粒子效果

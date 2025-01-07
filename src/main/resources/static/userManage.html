@@ -18,15 +18,17 @@
     <!--输入搜索框-->
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="用户名">
-            <el-input v-model="formInline.user" placeholder=""></el-input>
+            <el-input v-model="formInline.username" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="角色">
-            <el-select v-model="formInline.region" placeholder="请选择">
-                <el-option label="超级管理员" value="超级管理员"></el-option>
-                <el-option label="学生" value="学生"></el-option>
-                <el-option label="教师" value="教师"></el-option>
-                <el-option label="通知管理员" value="通知管理员"></el-option>
-                <el-option label="课程管理员" value="课程管理员"></el-option>
+            <el-select v-model="formInline.role" placeholder="请选择 " clearable >
+                <!--动态渲染-->
+                <el-option
+                        v-for="role in roleList"
+                        :key="role.id"
+                        :label="role.name"
+                        :value="role.name">
+                </el-option>
             </el-select>
         </el-form-item>
         <el-form-item>
@@ -35,7 +37,7 @@
     </el-form>
     <!--操作按钮-->
     <el-row>
-        <el-button type="success" plain @click="dialogVisible = true" icon="el-icon-edit">添加</el-button>
+        <el-button type="success" plain @click="handleAdd" icon="el-icon-edit">添加</el-button>
         <!--批量删除-->
         <el-button type="danger" plain icon="el-icon-delete" @click="DeleteByIds">批量删除</el-button>
     </el-row>
@@ -45,24 +47,28 @@
             :title="dialogType === 'add' ? '添加用户' : '修改用户'"
             :visible.sync="dialogVisible"
             width="30%"
-            :before-close="handleClose">
+            @closed="handleClose">
 
         <el-form ref="updateForm" :model="updateForm" label-width="80px">
             <el-form-item label="用户名">
-                <el-input v-model="updateForm.name"></el-input>
+                <el-input v-model="updateForm.username"></el-input>
             </el-form-item>
             <el-form-item label="密码">
-                <el-input v-model="updateForm.pwd" type="password"></el-input>
+                <el-input v-model="updateForm.password" type="text"></el-input>
             </el-form-item>
-            <el-form-item label="加密盐值">
-                <el-input v-model="updateForm.nickname"></el-input>
+            <el-form-item label="别名">
+                <el-input v-model="updateForm.salt"></el-input>
             </el-form-item>
             </el-form-item>
             <el-form-item label="用户角色">
-                <el-select v-model="updateForm.region" placeholder="请选择角色">
-                    <el-option label="管理员" value="管理员"></el-option>
-                    <el-option label="学生" value="学生"></el-option>
-                    <el-option label="老师" value="老师"></el-option>
+                <el-select v-model="updateForm.role" placeholder="请选择角色" clearable>
+                    <!--动态渲染-->
+                    <el-option
+                            v-for="role in roleList"
+                            :key="role.id"
+                            :label="role.name"
+                            :value="role.name">
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -75,7 +81,7 @@
     <!--表格-->
     <template>
         <el-table
-                ref="table"
+                v-loading="loading"
                 :data="tableData"
                 @selection-change="handleSelectionChange"
                 @select-all="handleSelectAll"
@@ -96,13 +102,13 @@
             </el-table-column>
             <!--姓名-->
             <el-table-column
-                    label="姓名"
+                    label="用户名"
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
-                        <p>姓名: {{ scope.row.name }}</p>
+                        <p>用户名: {{ scope.row.username }}</p>
                         <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.name }}</el-tag>
+                            <el-tag size="medium">{{ scope.row.username }}</el-tag>
                         </div>
                     </el-popover>
                 </template>
@@ -114,9 +120,9 @@
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
-                        <p>盐值: {{ scope.row.nickname }}</p>
+                        <p>别名: {{ scope.row.salt }}</p>
                         <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.nickname }}</el-tag>
+                            <el-tag size="medium">{{ scope.row.salt }}</el-tag>
                         </div>
                     </el-popover>
                 </template>
@@ -129,11 +135,20 @@
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
-                        <p>姓名: {{ scope.row.role }}</p>
+                        <p>角色: {{ scope.row.role }}</p>
                         <div slot="reference" class="name-wrapper">
                             <el-tag size="medium">{{ scope.row.role }}</el-tag>
                         </div>
                     </el-popover>
+                </template>
+            </el-table-column>
+
+            <!--密码-->
+            <el-table-column
+                    label="密码"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ '********' }}</span>
                 </template>
             </el-table-column>
 
@@ -152,6 +167,17 @@
         </el-table>
     </template>
 
+    <!--分页查询-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageNum"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+
 
 </div>
 
@@ -161,19 +187,18 @@
         method:"post",
         data() {
             return {
+                loading: false,
+                roleList: [],// 角色列表
                 formInline: {
-                    user: '',
-                    region: ''
+                    username: '',
+                    role:''
                 },
+                pageNum: 1,        // 当前页码
+                pageSize: 5,      // 每页显示条数
+                total: 0,          // 总条数
                 // ... 其他数据
                 multipleSelection: [], // 存储选中的行
-                dialogVisible: false,
                 form: {
-                    name: '',
-                    pwd:"",
-                    nickname:"",
-                    role:"",
-                    region: '',
                     date1: '',
                     date2: '',
                     delivery: false,
@@ -185,77 +210,164 @@
                 ids:[],
                 /*修改时的返回数据*/
                 updateForm: {
-                    name: '',
-                    pwd: '',
-                    nickname: '',
-                    region: '',
-                    available: 1  // 添加是否启用字段
+                    username: '',
+                    password: '',
+                    salt: '',
+                    role:'',
                 },
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
+                dialogVisible: false,
                 // 页面中表格显示的内容
-                tableData: [{
-                    id:'1',
-                    name: '王小虎',
-                    nickname:"admin",
-                    role:"管理员",
-                    date: '2016-05-02',
-                    available: 1
-                }, {
-                    id:'2',
-                    date: '2016-05-04',
-                    name: '王虎',
-                    nickname:"admin",
-                    role:"管理员",
-                    available: 1
-                }, {
-                    id:'3',
-                    date: '2016-05-01',
-                    name: '王大虎',
-                    nickname:"admin",
-                    role:"管理员",
-                    available: 0
-                }, {
-                    id:'6',
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    nickname:"admin",
-                    role:"管理员",
-                    available: 1
-                }],
+                tableData: [],
             }
         },
         methods: {
+
+            // 统一的数据获取方法
+            fetchData() {
+                // 如果有查询条件，使用模糊查询
+                if (this.formInline.username || this.formInline.role) {
+                    this.onSubmit();
+                } else {
+                    this.getAll();
+                }
+            },
+            // 处理每页显示条数变化
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.pageNum = 1;  // 重置到第一页
+                this.fetchData();
+            },
+            // 处理页码变化
+            handleCurrentChange(val) {
+                this.pageNum = val;
+                this.fetchData();
+            },
+
+            getRoleList(){
+              axios({
+                  url:'http://localhost:8080/user/roleList',
+                  method:'post',
+              }).then(res =>{
+                  this.roleList = res.data.data;
+              })
+            },
+            // 获取表格数据
             getAll(){
                 axios({
                     url:'http://localhost:8080/user/getUserAll',
                     method:'post',
                     data:{
-
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
                     }
                 }).then(res =>{
-                    console.log(res)
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                    }
 
                 })
             },
             // 模糊查询
             onSubmit() {
-                //todo:模糊查询
-                // console.log(this.formInline.user + " " + this.formInline.region)
+                // 重置页码到第一页
+                this.pageNum = 1;
+                axios({
+                    url:'http://localhost:8080/user/fuzzyQueryByName',
+                    method:'post',
+                    data:{
+                        role:this.formInline.role,
+                        username: this.formInline.username,
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    }
+                }).then(res =>{
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                        // this.$message.success('查询成功');
+                        if(this.pageNum === 1) {
+                            this.$message.success('查询成功');
+                        }
+                    }
+
+                })
             },
             // 关闭按钮
             handleClose(done) {
+                this.updateForm = {
+                    username: '',
+                    password: '',
+                    salt: '',
+                    role: ''
+                };
                 done();
             },
             // 添加用户
             add() {
-                // todo:添加
-                // alert("添加")
+                axios({
+                    url:'http://localhost:8080/user/addUser',
+                    method:'post',
+                    data:this.updateForm,
+                }).then(res =>{
+                    if(res.data.code == 200){
+                        this.$message.success('添加成功');
+                        this.dialogVisible = false;
+                        this.pageNum = 1;
+                        this.fetchData();
+                    }else{
+                        this.$message.error('添加失败');
+                        this.dialogVisible = false;
+                        this.pageNum = 1;
+                        this.fetchData();
+                    }
+                })
+            },
+            // 添加按钮点击处理
+            handleAdd() {
+                this.dialogType = 'add';
+                this.dialogVisible = true;
+                // 重置表单数据
+                this.updateForm = {
+                    username: '',
+                    password: '',
+                    salt: '',
+                    role: ''
+                };
             },
             // 批量删除
             DeleteByIds(){
-                //todo:根据
                 console.log(this.ids)
+                this.$confirm('确认删除已选择的用户?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url: 'http://localhost:8080/user/deleteByIds',
+                        method: 'post',
+                        data:this.ids,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success('删除成功');
+                            this.pageNum = 1;
+                            this.fetchData();
+                        } else {
+                            this.$message.error(res.data.msg || '删除失败');
+                        }
+                    }).catch(err => {
+                        console.error('删除失败:', err);
+                        this.$message.error('删除失败');
+                    });
+                }).catch(() => {
+
+                });
             },
             // 处理编辑按钮点击时显示的内容
             handleEdit(row) {
@@ -263,18 +375,13 @@
                 this.dialogVisible = true;
                 // 复制数据到编辑表单
                 this.updateForm = {
-                    name: row.name,
-                    pwd: '**********', // 密码通常不回显
-                    nickname: row.nickname,
-                    region: row.role,
-                    delivery: row.delivery || false,
-                    available: row.available // 添加状态字段
+                    username: row.username,
+                    password: row.password,
+                    salt: row.salt,
+                    role:row.role,
                 };
             },
-            // 处理开关状态变化
-            handleSwitchChange(val) {
-                this.updateForm.available = val ? 1 : 0;
-            },
+
 
             // 表格多选框选中事件
             handleSelectionChange(val) {
@@ -297,20 +404,34 @@
             clearSelection() {
                 this.$refs.table.clearSelection();
             },
+            /*修改*/
             updateUser(){
-                // todo：修改
-                console.log(this.ids)
-                // alert("修改")
+                axios({
+                    url:'http://localhost:8080/user/updateUser',
+                    method:'post',
+                    data:this.updateForm
+                }).then(res =>{
+                    console.log(res)
+                    if(res.data.code == 200){
+                        this.$message.success('修改成功');
+                        this.dialogVisible = false;
+                        this.pageNum = 1;
+                        this.fetchData();
+                    }else{
+                        this.$message.error('修改失败');
+                        this.dialogVisible = false;
+                        this.getAll();
+                    }
+                })
             },
             // 统一处理表单提交
             handleSubmit() {
                 this.$refs.updateForm.validate((valid) => {
                     if (valid) {
                         if (this.dialogType === 'add') {
-                            // 处理添加
                             this.add();
                         } else {
-                            // 处理更新
+                            // 更新
                             this.updateUser();
                         }
                     }
@@ -318,12 +439,35 @@
             },
             // 删除操作(单个删除）
             handleDelete(index, row) {
-                // todo:根据id删除
-                console.log(row.id)
+                this.$confirm('确认删除该用户?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url: 'http://localhost:8080/user/deleteById',
+                        method: 'post',
+                        data: { id: row.id }
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success('删除成功');
+                            this.pageNum = 1;
+                            this.fetchData();  // 刷新列表
+                        } else {
+                            this.$message.error(res.data.msg || '删除失败');
+                        }
+                    }).catch(err => {
+                        console.error('删除失败:', err);
+                        this.$message.error('删除失败');
+                    });
+                }).catch(() => {
+
+                });
             },
         },
         mounted() {
-            this.getAll();
+            this.fetchData();
+            this.getRoleList()
         }
     })
 </script>

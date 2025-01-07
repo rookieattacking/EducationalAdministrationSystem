@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="js/Vue.main.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/axios.js"></script>
 </head>
 <body>
 <div id="app">
@@ -20,7 +21,6 @@
             <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
         </el-form-item>
     </el-form>
-
 
     <!--表格-->
     <template>
@@ -59,9 +59,9 @@
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
-                        <p>任课教师: {{ scope.row.synopsis }}</p>
+                        <p>任课教师: {{ scope.row.username }}</p>
                         <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.teacher }}</el-tag>
+                            <el-tag size="medium">{{ scope.row.username }}</el-tag>
                         </div>
                     </el-popover>
                 </template>
@@ -91,9 +91,9 @@
                     width="180">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
-                        <p>课时: {{ scope.row.classHours }}</p>
+                        <p>课时: {{ scope.row.classHour }}</p>
                         <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.classHours }}</el-tag>
+                            <el-tag size="medium">{{ scope.row.classHour }}</el-tag>
                         </div>
                     </el-popover>
                 </template>
@@ -112,19 +112,20 @@
                     </el-popover>
                 </template>
             </el-table-column>
-
         </el-table>
     </template>
-    <!--分页-->
+
+    <!--分页查询-->
     <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-sizes="[10, 15, 20, 25]"
-            :page-size="10"
+            :current-page="pageNum"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total">
     </el-pagination>
+
 </div>
 </body>
 <script>
@@ -137,14 +138,21 @@
                     coursename: '',
                     teachername: ''
                 },
+                pageNum: 1,        // 当前页码
+                pageSize: 5,      // 每页显示条数
+                total: 0,          // 总条数
                 // ... 其他数据
                 multipleSelection: [], // 存储选中的行
+                /*批量删除*/
+                ids:[],
+                /*修改时的返回数据*/
+                form: {
+                    coursename: '',
+                    synopsis: '',
+                },
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
-                // 关闭按钮
-                handleClose(done) {
-                    done();
-                },
+
                 tableData: [{
                     id:'1',
                     coursename: '王小虎',
@@ -154,40 +162,130 @@
                     startDate: '2016-05-02',
                     endDate: '2016-05-02',
                     choiceNum:'',
-                }, {
-                    id:'2',
-                    coursename: '王虎',
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    testMode:"",
-                    studentNum:"",
-                    choiceNum:'',
-                }, {
-                    id:'3',
-                    coursename: '王大虎',
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    testMode:"",
-                    studentNum:"",
-                    choiceNum:'',
-                }, {
-                    id:'6',
-                    coursename: '王小虎',
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    testMode:"",
-                    studentNum:"",
-                    choiceNum:'',
                 }],
             }
         },
         methods:{
+            // 关闭按钮
+            handleClose(done) {
+                done();
+            },
+            // 统一的数据获取方法
+            fetchData() {
+                // 如果有查询条件，使用模糊查询
+                if (this.formInline.username || this.formInline.coursename) {
+                    this.onSubmit();
+                } else {
+                    this.getPageList();
+                }
+            },
+            // 处理每页显示条数变化
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.pageNum = 1;  // 重置到第一页
+                this.fetchData();
+            },
+            // 处理页码变化
+            handleCurrentChange(val) {
+                this.pageNum = val;
+                this.fetchData();
+            },
+            getPageList(){
+                axios({
+                    url:'http://localhost:8080/easCourse/pageList',
+                    method:'post',
+                    data:{
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    }
+                }).then(res =>{
+                    console.log(res.data)
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                    }
+
+                })
+            },
             onSubmit() {
-                console.log('submit!');
-            }
+                // 重置页码到第一页
+                this.pageNum = 1;
+                axios({
+                    url:'http://localhost:8080/easCourse/fuzzyPageList',
+                    method:'post',
+                    data:{
+                        coursename:this.formInline.coursename,
+                        username: this.formInline.username,
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    }
+                }).then(res =>{
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                        // this.$message.success('查询成功');
+                        if(this.pageNum === 1) {
+                            this.$message.success('查询成功');
+                        }
+                    }
+
+                })
+            },
+
+            deleteByIds(){
+                /*todo：批量删除*/
+                console.log(this.ids)
+
+            },
+            // 添加
+            add(){
+                location.href = 'addCourse.html'
+            },
+            // 处理编辑按钮点击时显示的内容
+            handleEdit(row) {
+                this.dialogType = 'edit';
+                this.dialogVisible = true;
+                // 复制数据到编辑表单
+                // this.form = {
+                //     coursename: row.coursename,
+                //     synopsis: row.synopsis,
+                // };
+                alert(111)
+            },
+
+            // 表格多选框选中事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+
+
+            // 全选
+            handleSelectAll(selection) {
+                this.multipleSelection = selection;
+                this.ids = selection.map(item => item.id);
+            },
+
+            // 单选
+            handleSelect(selection, row) {
+                this.multipleSelection = selection;
+                this.ids = selection.map(item => item.id);
+            },
+            // 清空选择
+            clearSelection() {
+                this.$refs.table.clearSelection();
+            },
+            // 删除操作(单个删除）
+            handleDelete(index, row) {
+                // todo:根据id删除
+                console.log(row.id)
+            },
+        },
+        mounted(){
+            this.getPageList();
         }
     })
 </script>

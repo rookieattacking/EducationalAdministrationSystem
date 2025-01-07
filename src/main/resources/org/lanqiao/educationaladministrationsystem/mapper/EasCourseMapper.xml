@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.lanqiao.educationaladministrationsystem.mapper.EasCourseMapper">
-    <resultMap id="BaseResultMap" type="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
-        <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="start_date"  jdbcType="DATE" property="startDate" />
-        <result column="end_date"  jdbcType="DATE" property="endDate" />
-        <result column="class_hour" jdbcType="SMALLINT" property="classHour" />
-        <result column="test_mode" jdbcType="VARCHAR" property="testMode" />
-        <result column="student_num" jdbcType="INTEGER" property="studentNum" />
-        <result column="choice_num" jdbcType="INTEGER" property="choiceNum" />
-        <result column="complete" jdbcType="INTEGER" property="complete" />
 
-        <result column="t_id" jdbcType="INTEGER" property="tId" />
-        <result column="base_course_id" jdbcType="INTEGER" property="baseCourseId" />
-
-        <!--<result column="teacherName" jdbcType="VARCHAR" property="teacherName" />-->
-        <!--<result column="courseName" jdbcType="VARCHAR" property="courseName" />-->
+    <resultMap id="BaseResultMap" type="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery">
+        <id column="id"  property="id" />
+        <result column="start_date"   property="startDate" />
+        <result column="end_date"   property="endDate" />
+        <result column="class_hour"  property="classHour" />
+        <result column="test_mode"  property="testMode" />
+        <result column="student_num"  property="studentNum" />
+        <result column="choice_num"  property="choiceNum" />
     </resultMap>
+
+
     <sql id="Base_Column_List">
     id, start_date, end_date, class_hour, test_mode, student_num, choice_num, t_id, base_course_id
     </sql>
@@ -143,9 +139,12 @@
             #{item}
         </foreach>
     </delete>
-    <select id="getCount" resultType="java.lang.Integer">
-        select count(*) from eas_course
-    </select>
+
+
+
+
+
+
     <select id="getList" resultMap="BaseResultMap">
         select
         B.id, start_date, end_date, class_hour, test_mode, student_num, choice_num, t_id, base_course_id
@@ -160,9 +159,6 @@
                 and C.name like CONCAT ('%',#{easCourse.teacherName},'%')
             </if>
         </where>
-        <if test="pageUtil != null">
-            limit #{pageUtil.pageStart},#{pageUtil.count}
-        </if>
     </select>
     <select id="findCourseByBaseCourseIdAndTeacherId" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
         select * from eas_course
@@ -193,9 +189,6 @@
                 and B.t_id = #{tId}
             </if>
         </where>
-        <!--<if test="pageUtil != null">-->
-        <!--    limit #{pageUtil.pageStart},#{pageUtil.count}-->
-        <!--</if>-->
     </select>
 
 <!--    <select id="getTotalItemsCountBySid" resultType="java.lang.Integer">-->
@@ -311,6 +304,8 @@
         </where>
 
     </select>
+
+
     <select id="getTotalNoPass" resultType="java.lang.Integer">
         select count(S.score)
         from eas_score as S,eas_course as C, eas_base_course as B
@@ -324,5 +319,65 @@
             and 60 > S.score
         </where>
     </select>
+
+
+
+
+
+
+
+
+    <!--分页查询计算总行数-->
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT COUNT(c.id)
+        FROM eas_course s
+                 LEFT JOIN eas_base_course c ON s.base_course_id = c.id
+                 LEFT JOIN eas_teacher t ON s.t_id = t.id
+    </select>
+
+
+
+<!-- SELECT *
+        FROM eas_course s
+                 LEFT JOIN eas_base_course c ON s.base_course_id = c.id
+                 LEFT JOIN eas_teacher t ON s.t_id = t.id-->
+    <!--分页查询-->
+    <select id="getPageList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery" resultMap="BaseResultMap">
+        select c.id id,c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
+        limit #{offSet},#{pageSize}
+    </select>
+
+
+    <!--模糊查询分页总行数-->
+    <select id="getFuzzyCount" resultType="java.lang.Integer">
+        SELECT COUNT(c.id)
+        FROM eas_course s
+                 LEFT JOIN eas_base_course c ON s.base_course_id = c.id
+                 LEFT JOIN eas_teacher t ON s.t_id = t.id
+            <where>
+                <if test="easeCourseFuzzyQuery.coursename != null and easeCourseFuzzyQuery.coursename != ''">
+                    coursename like CONCAT ('%',#{easeCourseFuzzyQuery.coursename},'%')
+                </if>
+                <if test="easeCourseFuzzyQuery.username != '' and easeCourseFuzzyQuery.username != null">
+                    and username like CONCAT ('%',${easeCourseFuzzyQuery.username},'%');
+                </if>
+            </where>
+    </select>
+
+
+    <!--模糊查询分页-->
+    <select id="getFuzzyPageList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery" resultMap="BaseResultMap">
+        select c.id id,c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
+        <where>
+            <if test="easeCourseFuzzyQuery.coursename != null and easeCourseFuzzyQuery.coursename != ''">
+                coursename like CONCAT ('%',#{easeCourseFuzzyQuery.coursename},'%')
+            </if>
+            <if test="easeCourseFuzzyQuery.username != '' and easeCourseFuzzyQuery.username != null">
+                and username like CONCAT ('%',${easeCourseFuzzyQuery.username},'%');
+            </if>
+        </where>
+    limit #{offSet},#{easeCourseFuzzyQuery.pageSize}
+    </select>
+
 
 </mapper>

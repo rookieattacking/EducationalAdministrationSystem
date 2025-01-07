@@ -9,9 +9,67 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="js/Vue.main.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/axios.js"></script>
 </head>
 <body>
 <div id="app">
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="姓名">
+            <el-input v-model="formInline.name" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="班级">
+            <el-select v-model="formInline.classes" placeholder="请选择" clearable>
+                <el-option label="计算机科学与技术1班" value="计算机科学与技术1班"></el-option>
+                <el-option label="计算机科学与技术2班" value="计算机科学与技术2班"></el-option>
+                <el-option label="软件技术1班" value="软件技术1班"></el-option>
+                <el-option label="软件技术2班" value="软件技术2班"></el-option>
+                <el-option label="大数据应用1班" value="大数据应用1班"></el-option>
+                <el-option label="大数据应用2班" value="大数据应用2班"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+
+    <!--编辑学生-->
+    <el-dialog
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+
+        <el-form ref="updateForm" :model="updateForm" label-width="80px">
+            <el-form-item label="用户名">
+                <el-input v-model="updateForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名">
+                <el-input v-model="updateForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="性别">
+                <el-input v-model="updateForm.sex"></el-input>
+            </el-form-item>
+            <!--生日-->
+            <el-form-item label="生日">
+                <el-input v-model="updateForm.birthday"></el-input>
+            </el-form-item>
+            <el-form-item label="电话">
+                <el-input v-model="updateForm.phone"></el-input>
+            </el-form-item>
+
+            <el-form-item label='班级'>
+                <el-select v-model="updateForm.classes" placeholder="请选择"  clearable>
+                    <!--todo-->
+                    <el-option  label="教室" value="教室1"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <!--                <el-button type="primary" @click="handleSubmit">确定</el-button>-->
+                <el-button type="primary" @click="updateStudent">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
     <!--表格-->
     <template>
         <el-table
@@ -57,73 +115,221 @@
                     width="150">
             </el-table-column>
             <el-table-column
-                    prop="classname"
+                    prop="classes"
                     label="班级"
                     sortable
-                    width="150">
+                    width="200">
             </el-table-column>
             <el-table-column
                     prop="motto"
                     label="座右铭"
                     width="150">
             </el-table-column>
+            <!--操作-->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
         </el-table>
     </template>
+    <!--分页查询-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageNum"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
 </div>
 </body>
-    <script>
-        new Vue({
-            el:'#app',
-            method:'post',
-            data(){
-                return{
-                    formInline: {
-                        name: '',
-                        phone:'',
-                        region: ''
-                    },
-                    tableData: [{
-                        id:'1',
-                        username:'lll',
-                        birthday: '2016-05-02',
-                        name: '王小虎',
-                        classname:"",
-                        phone:'124343444',
-                    }, {
-                        id:'2',
-                        username:'ww',
-                        classname:"",
-                        phone:'124343444',
-                        birthday: '2016-05-04',
-                        name: '王小虎',
-                        motto:'',
-                    }, {
-                        id:"3",
-                        username:'nnn',
-                        classname:"",
-                        phone:'124343444',
-                        birthday: '2016-05-01',
-                        name: '王小虎',
-                        motto:'',
-                    }, {
-                        id:'4',
-                        username:'xx',
-                        phone:'124343444',
-                        birthday: '2016-05-03',
-                        classname:"",
-                        motto:'',
-                        name: '王小虎',
-                    }]
+<script>
+    new Vue({
+        el:'#app',
+        method:'post',
+        data(){
+            return{
+                formInline: {
+                    name: '',
+                    classes:'',
+                },
+                dialogVisible: false,
+                /*修改时的返回数据*/
+                updateForm: {
+                    username: '',
+                    name:'',
+                    sex:'',
+                    birthday: '',
+                    phone:'',
+                    classes: ''
+                },
+                pageNum: 1,        // 当前页码
+                pageSize: 5,      // 每页显示条数
+                total: 0,          // 总条数
+                tableData: []
+            }
+        },
+        methods:{
+            /*使用一个整体方法来解决分页查询的问题*/
+            fetchData(){
+                /*有条件的时候使用*/
+                if(this.formInline.name || this.formInline.education){
+                    this.onSubmit();
+                }else{
+                    this.ListBypage();
                 }
             },
-            methods:{
-                onSubmit() {
-                    console.log('submit!');
-                },
-                formatter(row, column) {
-                    return row.address;
-                }
+            // 处理每页显示条数变化
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.pageNum = 1;  // 重置到第一页
+                this.fetchData();
+            },
+
+            // 处理页码变化
+            handleCurrentChange(val) {
+                this.pageNum = val;
+                this.fetchData();
+            },
+            //分页查询
+            ListBypage(){
+                axios({
+                    url:'http://localhost:8080/student/selectBypage',
+                    method:'post',
+                    data:{
+                        /*修改*/
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    }
+                }).then(res =>{
+                    /**/
+                    if (res.data.code == 200) {
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                    }
+                }).catch(error => {
+                    console.error('分页查询失败', error);
+                });
+            },
+            // 分页模糊查询
+            onSubmit() {
+                this.pageNum = 1;
+                axios({
+                    url:'http://localhost:8080/student/selectBypageLike',  //  selectLike
+                    method:'post',
+                    data: {
+                        name:this.formInline.name,  // 发送搜索的学生姓名
+                        classes: this.formInline.classes,
+                        pageNum:this.pageNum,
+                        pageSize:this.pageSize,
+                    }
+                }).then(res=> {
+                    if (res.data.code == 200) {
+                        this.tableData = res.data.data.list;
+                        this.pageNum = res.data.data.pageNum;
+                        this.total = res.data.data.total;
+                        this.pageSize = res.data.data.pageSize;
+                        // this.$message.success('查询成功');
+
+                    }
+                })
+            },
+            // 删除操作(单个删除）
+            handleDelete(index, row) {
+                this.$confirm('确认删除该用户?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url: 'http://localhost:8080/student/delete',
+                        method: 'post',
+                        data: { id: row.id }
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success('删除成功');
+                            // this.selectAll();  // 刷新列表
+                            this.ListBypage();
+                        } else {
+                            this.$message.error(res.data.msg || '删除失败');
+                        }
+                    }).catch(err => {
+                        console.error('删除失败:', err);
+                        this.$message.error('删除失败');
+                    });
+                }).catch(() => {
+
+                });
+            },
+            // formatter(row, column) {
+            //     return row.address;
+            // },
+
+            /*数据回显*/
+            handleEdit(row) {
+                this.dialogVisible = true;
+                // 复制数据到编辑表单
+                this.updateForm = {
+                    username:row.username,
+                    name:row.name,
+                    sex:row.sex,
+                    birthday:row.birthday,
+                    phone:row.phone,
+                    classes:row.classes
+                };
+            },
+
+            // 关闭按钮
+            handleClose(done) {
+                done();
+            },
+            // 修改学生
+            updateStudent(){
+                var _this = this;
+                axios({
+                    url:'http://localhost:8080/student/update',
+                    method:'post',
+                    data:_this.updateForm  //发送更新的数据
+                }).then(res=>{
+                    if(res.data.success) {
+                        this.$message({
+                            message: '恭喜你，修改成功',
+                            type: 'success'
+                        });
+                    }
+                    //更新
+                    // _this.selectAll()
+                    _this.ListBypage()
+                    //关闭窗口
+                    this.dialogVisible = false;
+                })
             }
-        })
-    </script>
+        },
+        //根据id更新数据
+        // update(id){
+        //     this.selectAll(id);
+        // },
+
+        // 修改操作的提交按钮
+        handleSubmit(index) {
+            let id=this.data[index].id
+            this.dialogVisible=true
+            this.updateForm.id=id
+            this.update(id)
+        },
+        mounted(){
+            this.onSubmit();
+        }
+    })
+</script>
 </html>

@@ -1,45 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.lanqiao.educationaladministrationsystem.mapper.EasClassMapper">
+
+
+
+
+    <select id="findClassName" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
+        select * from eas_class where classes = #{classes}
+    </select>
+
+
+    <select id="getClassView" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
+        select * from eas_class where id = #{id}
+    </select>
+
+
+
+
+
+
+
+
+    <!--获取所有的班级信息 分页查询-->
+    <select id="easClassList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
+        select * from eas_class
+        limit #{offSet},#{pageSize}
+    </select>
+
+
+    <!--添加班级信息-->
     <insert id="addClass">
-        insert into eas_class(classes)
-          values (#{classes})
+        insert into eas_class
+        values (null,#{easClass.classes})
     </insert>
+
+
+    <!--根据id 修改班级信息-->
     <update id="updateClass">
         update eas_class
         <set>
             <if test="classes != null">classes = #{classes}</if>
         </set>
-        where id=#{id}
+        where id = #{id}
     </update>
-    <delete id="batchDeleteClass">
-        delete from eas_class where id in
-        <foreach collection="array" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-    </delete>
-    <select id="getAll" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
-        select * from eas_class
-    </select>
+
+
+    <!--获取总数分页-->
     <select id="getCount" resultType="java.lang.Integer">
         select count(*) from eas_class
     </select>
-    <select id="getList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
-        select * from eas_class
+
+
+    <!--模糊查询的总页数-->
+    <select id="getFuzzyCount" resultType="java.lang.Integer">
+        select count(*) from eas_class
         <where>
-            <if test="easClass.classes != null and easClass.classes != ''">
-                and classes like concat('%',#{easClass.classes},'%')
+            <if test="classes != null and classes != ''">
+                and classes like CONCAT('%', #{classes}, '%')
             </if>
         </where>
-        <!--<if test="pageUtil != null">-->
-        <!--    limit #{pageUtil.pageStart},#{pageUtil.count}-->
-        <!--</if>-->
     </select>
-    <select id="findClassName" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
-        select * from eas_class where classes = #{classes}
+
+
+    <!--模糊查询分页-->
+    <select id="getList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasClass.EasClassFuzzyQuery">
+        select * from eas_class
+    <where>
+          <if test="easClassFuzzyQuery.classes != null and easClassFuzzyQuery.classes != ''">
+              and classes like concat('%',#{easClassFuzzyQuery.classes},'%')
+          </if>
+      </where>
+      limit #{offSet},#{easClassFuzzyQuery.pageSize}
     </select>
-    <select id="getClassView" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasClass">
-        select * from eas_class where id = #{id}
-    </select>
+
+
+
+    <!--批量删除-->
+    <delete id="batchDeleteClass">
+        delete from eas_class where id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!--单个删除-->
+    <delete id="deleteById">
+        delete from eas_class where id = #{id};
+    </delete>
+
 
 </mapper>

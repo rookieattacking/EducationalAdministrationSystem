@@ -11,14 +11,14 @@
         <result column="releasedate" jdbcType="DATE" property="releasedate" />
     </resultMap>
     <sql id="Base_Column_List">
-    id, title, author, content, type, releasedate
+        id, title, author, content, type, releasedate
     </sql>
     <insert id="addNotice" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasNotice">
-    insert into eas_notice (id, title, author,content, type, releasedate)
+        insert into eas_notice (id, title, author,content, type, releasedate)
         values (
-        #{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR},
-        #{content,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, CURDATE()
-      )
+                   #{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR},
+                   #{content,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, CURDATE()
+               )
     </insert>
     <update id="updateNotice" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasNotice">
         update eas_notice

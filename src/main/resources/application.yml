@@ -1,3 +1,4 @@
+
 spring:
   datasource:
     username: root
@@ -11,3 +12,8 @@ spring:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+server:
+  servlet:
+    session:
+      timeout: 60s

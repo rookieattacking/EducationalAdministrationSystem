@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.lanqiao.educationaladministrationsystem.mapper.EasTeacherMapper">
 
+    <!--    resultMap节点-->
     <resultMap id="resTeacher" type="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
         <!-- property指实体类 -->
         <id property="id" column="id"/>
@@ -12,15 +13,15 @@
         <result property="phone" column="phone"/>
         <result property="education" column="education"/>
         <result property="motto" column="motto"/>
-        <!--<association property="user" javaType="org.lanqiao.educationaladministrationsystem.pojo.EasUser">-->
-        <!--    <id property="id" column="id"/>-->
-        <!--    <result property="username" column="username"/>-->
-        <!--</association>-->
     </resultMap>
+
+    <!--    insert节点-->
     <insert id="addUsername">
         insert into eas_teacher(username)
-          values (#{username})
+        values (#{username})
     </insert>
+
+    <!--    update节点-->
     <update id="updateTeacher">
         update eas_teacher
         <set>
@@ -33,11 +34,15 @@
         </set>
         where username=#{username}
     </update>
+
+
+
+
     <delete id="deleteTeacher">
         delete from eas_teacher
         <where>
-            <if test="username != null and username != ''">
-                username = #{username}
+            <if test="id != 0">
+                id = #{id}
             </if>
         </where>
     </delete>
@@ -71,8 +76,19 @@
     <select id="getAll" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
         select * from eas_teacher
     </select>
+
+
+    <!--    模糊查询-->
     <select id="findTeacherByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
-        select * from eas_teacher where username = #{username,jdbcType=VARCHAR}
+        select * from eas_teacher
+        <where>
+            <if test="name != null and name != '' ">
+                 and name like concat('%',#{name},'%')
+            </if>
+            <if test="education != null and education != ''">
+                and education like concat('%',#{education},'%')
+            </if>
+        </where>
     </select>
     <select id="getTotal" resultType="java.lang.Integer">
         select count(*) from eas_teacher

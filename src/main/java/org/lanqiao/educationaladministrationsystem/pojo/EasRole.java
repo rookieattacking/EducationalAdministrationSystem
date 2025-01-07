@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EasRole {
 
-  private long id;
+  private Integer id;
   private String name;
   private long available;
 
