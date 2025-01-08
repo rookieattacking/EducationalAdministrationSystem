@@ -38,26 +38,6 @@
         </el-form-item>
     </el-form>
 
-    <el-dialog
-            :title="dialogType === 'add' ? '添加基本课程' : '修改基本课程'"
-            :visible.sync="dialogVisible"
-            width="30%"
-            @close="handleClose">
-        <el-form ref="updateForm" :model="updateForm" label-width="80px">
-            <el-form-item label="课程名称">
-                <el-input v-model="updateForm.coursename"></el-input>
-            </el-form-item>
-            <el-form-item label="课程简介">
-                <el-input v-model="updateForm.synopsis" type="textarea"></el-input>
-            </el-form-item>
-
-            <el-form-item>
-                <el-button type="primary" @click="handleSubmit">确定</el-button>
-                <el-button @click="dialogVisible = false">取消</el-button>
-            </el-form-item>
-        </el-form>
-    </el-dialog>
-
     <!--表格-->
     <template>
         <el-table

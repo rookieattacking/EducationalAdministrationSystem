@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -85,23 +87,27 @@ public class EasCourseController {
          *  1.先使用EasCourseQuery 实体类来接收用户输入的信息
          *  2.添加的时候，根据教师名查询出对应的Id和课程id之后在添加到eas_course这张中
          */
-        /* 先添加新的基本课程信息 */
-        int result1 = easBaseCourseService.addNewBaseCourse(easCourseQuery.getCoursename());
-
-        /* 要查询出新的基本课程id */
+        /**
+         *  1. 先根据课程名和教师姓名分别查询出他们个自的id
+         *  2.
+         */
+        /* 查询出添加的课程id */
         int baseCourseId = easBaseCourseService.getBaseCourseId(easCourseQuery.getCoursename());
-        /* 获取教师id */
-        int teacherId = easTeacherService.getTeacherId(easCourseQuery.getCoursename());
-        /* 最后添加  */
+        // System.out.println(baseCourseId);
         String startDate = easCourseQuery.getStartDate();
         String endDate = easCourseQuery.getEndDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        /* 查询出的教师id */
+        int teacherId = easTeacherService.getTeacherId(easCourseQuery.getCoursename());
+        /* 添加 */
+        // String startDate = easCourseQuery.getStartDate();
+        // String endDate = easCourseQuery.getEndDate();
         Integer classHour = easCourseQuery.getClassHour();
         String testMode = easCourseQuery.getTestMode();
         Integer studentNum = easCourseQuery.getStudentNum();
 
-        EasCourse easCourse = new EasCourse(startDate,endDate,classHour,testMode,studentNum,teacherId,baseCourseId);
-        int result2 = easCourseService.addCourse(easCourse);
-        if(result1 > 0 && result2 > 0){
+        int result = easCourseService.addCourse(new EasCourse(startDate, endDate, classHour, testMode, studentNum, teacherId, baseCourseId));
+        if(result > 0 ){
             return new ResponseUtil(200,"添加成功");
         }else{
             return new ResponseUtil(305,"添加失败");

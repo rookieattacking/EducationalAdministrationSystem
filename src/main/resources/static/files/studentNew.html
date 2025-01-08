@@ -112,7 +112,6 @@
             }
         },
         methods: {
-
             // 关闭按钮
             handleClose(done) {
                 done();
@@ -121,6 +120,12 @@
             mounted() {
                 this.onSubmit();
             }
+        },
+        mounted() {
+            // 页面加载后从 sessionStorage 获取数据
+            const studentInfo = sessionStorage.getItem("studentInfo");
+            const parsedInfo = JSON.parse(studentInfo);
+            this.tableData = Array.isArray(parsedInfo) ? parsedInfo : [parsedInfo];
         }
     })
 </script>

@@ -278,7 +278,7 @@
                             this.$message.success("登录成功");
                             // 使用sessionStorage存储
                             sessionStorage.setItem('studentName', this.loginForm.username);
-                            sessionStorage.setItem("studentInfo",res.data.data);
+                            sessionStorage.setItem("studentInfo", JSON.stringify(res.data.data));
                             location.href = 'Studentindex.html';
                         }
                     }else if(res.data.code == 305){

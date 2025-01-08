@@ -73,23 +73,23 @@
             <!-- 第一行：课程和任课教师 -->
             <div class="form-row">
                 <el-form-item label="课程" class="form-item">
-                    <el-select v-model="courseForm.baseCourseId" placeholder="请选择课程">
+                    <el-select v-model="courseForm.coursename" placeholder="请选择课程" clearable>
                         <el-option
                                 v-for="item in baseCourseOptions"
                                 :key="item.id"
                                 :label="item.coursename"
-                                :value="item.id">
+                                :value="item.coursename">
                         </el-option>
                     </el-select>
                 </el-form-item>
 
                 <el-form-item label="任课教师" class="form-item">
-                    <el-select v-model="courseForm.tId" placeholder="请选择教师">
+                    <el-select v-model="courseForm.username" placeholder="请选择教师" clearable>
                         <el-option
                                 v-for="item in teacherOptions"
                                 :key="item.id"
                                 :label="item.username"
-                                :value="item.id">
+                                :value="item.username">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -101,7 +101,7 @@
                     <el-date-picker
                             v-model="courseForm.startDate"
                             type="date"
-                            placeholder="选择开始日期">
+                            placeholder="选择开始日期" clearable>
                     </el-date-picker>
                 </el-form-item>
 
@@ -109,7 +109,7 @@
                     <el-date-picker
                             v-model="courseForm.endDate"
                             type="date"
-                            placeholder="选择结束日期">
+                            placeholder="选择结束日期" clearable>
                     </el-date-picker>
                 </el-form-item>
             </div>
@@ -182,20 +182,21 @@
                 })
             },
             // 提交表单
+            /*添加课程信息*/
             submitForm() {
                 axios({
                     url:'http://localhost:8080/easCourse/newAdd',
                     method:'post',
                     data:this.courseForm,
                 }).then(res =>{
-                    console.log(res.data)
-                    if(res.data.code == 200) {
-                        this.$message.success("添加成功");
-                    }else{
-                        this.$message.error("添加失败");
-                    }
+                    // console.log(res.data)
+                    // if(res.data.code == 200) {
+                    //     this.$message.success("添加成功");
+                    // }else{
+                    //     this.$message.error("添加失败");
+                    // }
                 }).catch(() =>{
-                    this.$message.error("添加有误，请联系管理员");
+                    this.$message.error("添加失败");
                 })
             },
 
