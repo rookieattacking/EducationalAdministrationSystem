@@ -91,5 +91,10 @@
         LIMIT #{offSet}, #{studentPageList.pageSize}
     </select>
 
+    <select id="selectOneByUsername" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasStudent">
+        select * from eas_student as s inner join eas_class as c on s.class_id = c.id
+        where username = #{username}
+    </select>
+
 
 </mapper>

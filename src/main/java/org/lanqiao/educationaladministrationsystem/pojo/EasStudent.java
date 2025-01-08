@@ -16,5 +16,6 @@ public class EasStudent {
   private String phone;
   private long classId;
   private String motto;
+  private String classes;
 
 }

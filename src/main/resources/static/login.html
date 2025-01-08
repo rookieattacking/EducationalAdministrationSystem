@@ -103,6 +103,7 @@
                                 placeholder="验证码"
                                 style="width: 70%">
                         </el-input>
+
                         <img
                                 :src="captchaUrl"
                                 class="captcha-img"
@@ -140,32 +141,32 @@
             :close-on-press-escape="false"
             :modal-append-to-body="false"
             @closed="handleDialogClosed">
-    <el-form :model="registerForm"
-             :rules="registerRules"
-             ref="registerForm"
-             @submit.native.prevent>
-        <el-form-item label="用户名" prop="username">
-            <el-input v-model="registerForm.username"
-                      @mousedown.native.stop>
-            </el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-            <el-input type="password"
-                      v-model="registerForm.password"
-                      @mousedown.native.stop>
-            </el-input>
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-            <el-input type="password"
-                      v-model="registerForm.confirmPassword"
-                      @mousedown.native.stop>
-            </el-input>
-        </el-form-item>
-    </el-form>
-    <div slot="footer">
-        <el-button @click="resetRegisterForm">重 置</el-button>
-        <el-button type="primary" @click="handleRegister">注 册</el-button>
-    </div>
+        <el-form :model="registerForm"
+                 :rules="registerRules"
+                 ref="registerForm"
+                 @submit.native.prevent>
+            <el-form-item label="用户名" prop="username">
+                <el-input v-model="registerForm.username"
+                          @mousedown.native.stop>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input type="password"
+                          v-model="registerForm.password"
+                          @mousedown.native.stop>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="confirmPassword">
+                <el-input type="password"
+                          v-model="registerForm.confirmPassword"
+                          @mousedown.native.stop>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer">
+            <el-button @click="resetRegisterForm">重 置</el-button>
+            <el-button type="primary" @click="handleRegister">注 册</el-button>
+        </div>
     </el-dialog>
 </div>
 
@@ -199,7 +200,7 @@
                     password: '',
                     confirmPassword: ''
                 },
-                captchaUrl: 'http://localhost:8080/code',
+                captchaUrl: 'http://localhost:8080/code2',
                 registerVisible: false,
                 rules: {
                     username: [
@@ -259,18 +260,15 @@
                 };
             },
             refreshCaptcha() {
-                // 方式一：使用后端接口（推荐）
-                this.captchaUrl = `http://localhost:8080/code?t=${new Date().getTime()}`;
+                // 方式一：使用后端接口
+                this.captchaUrl = `http://localhost:8080/code2?t=${new Date().getTime()}`;
             },
             // 处理登录
             handleLogin() {
                 axios({
                     url: 'http://localhost:8080/login',
                     method: 'post',
-                    data: {
-                        username: this.loginForm.username,
-                        password: this.loginForm.password,
-                    }
+                    data: this.loginForm,
                 }).then(res =>{
                     if(res.data.code == 200){
                         if(res.data.data == 1){
@@ -283,8 +281,10 @@
                             sessionStorage.setItem("studentInfo",res.data.data);
                             location.href = 'Studentindex.html';
                         }
-                    }else{
-                        this.$message.error("用户不存在");
+                    }else if(res.data.code == 305){
+                        this.$message.error("用户不存在,请先登录");
+                    }else if(res.data.code === 500){
+                        this.$message.error("验证码错误");
                     }
                 })
 
@@ -361,6 +361,8 @@
             }
         }
     });
+</script>
+<script>
 </script>
 </body>
 </html>

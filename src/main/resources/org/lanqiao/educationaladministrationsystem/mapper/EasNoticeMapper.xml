@@ -13,6 +13,8 @@
     <sql id="Base_Column_List">
         id, title, author, content, type, releasedate
     </sql>
+
+
     <insert id="addNotice" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasNotice">
         insert into eas_notice (id, title, author,content, type, releasedate)
         values (
@@ -20,6 +22,8 @@
                    #{content,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, CURDATE()
                )
     </insert>
+
+
     <update id="updateNotice" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasNotice">
         update eas_notice
         <set>
@@ -106,4 +110,42 @@
         from eas_notice
         where id = #{id,jdbcType=INTEGER}
     </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </mapper>

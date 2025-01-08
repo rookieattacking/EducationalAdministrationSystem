@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.lanqiao.educationaladministrationsystem.dto.EasTeacher.TeacherPageBean;
 import org.lanqiao.educationaladministrationsystem.dto.EasTeacher.TeacherPageList;
+import org.lanqiao.educationaladministrationsystem.pojo.EasStudent;
 import org.lanqiao.educationaladministrationsystem.pojo.EasTeacher;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
 

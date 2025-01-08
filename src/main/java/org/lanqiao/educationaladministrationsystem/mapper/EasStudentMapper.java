@@ -45,5 +45,7 @@ public interface EasStudentMapper {
     int studentCount(@Param("studentPageList")StudentPageList studentPageList);
 
 
+    EasStudent selectOneByUsername(String username);
+
 
 }

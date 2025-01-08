@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="../js/Vue.main.js"></script>
     <script src="../js/index.js"></script>
+    <script src="../js/axios.js"></script>
     <style>
         .notice-container {
             padding: 20px;
@@ -56,24 +57,15 @@
             <div class="top-row no-bottom-margin">
                 <div class="visibility-select">
                     <el-form-item label="公开度">
-                        <el-select
-                                v-model="noticeForm.visibility"
-                                placeholder="请选择"
-                                style="width: 200px"
-                                :disabled="isView">
-                            <el-option label="保存草稿" value="draft"></el-option>
-                            <el-option label="教师可见" value="teacher"></el-option>
-                            <el-option label="全体可见" value="all"></el-option>
+                        <el-select v-model="noticeForm.type" placeholder="请选择">
+                            <el-option label="草稿" value="3"></el-option>
+                            <el-option label="教师可见" value="2"></el-option>
+                            <el-option label="全体可见" value="1"></el-option>
                         </el-select>
                     </el-form-item>
                 </div>
 
-                <el-button
-                        type="primary"
-                        icon="el-icon-position"
-                        :disabled="isView">
-                    上传附件
-                </el-button>
+
             </div>
 
             <!-- 标题和发布人 -->
@@ -82,17 +74,15 @@
                     <el-form-item label="公告标题">
                         <el-input
                                 v-model="noticeForm.title"
-                                placeholder="请输入公告标题"
-                                :readonly="isView">
+                                placeholder="请输入公告标题">
                         </el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
                     <el-form-item label="发布人">
                         <el-input
-                                v-model="noticeForm.publisher"
-                                placeholder="请输入发布人"
-                                :readonly="isView">
+                                v-model="noticeForm.author"
+                                placeholder="请输入发布人">
                         </el-input>
                     </el-form-item>
                 </el-col>
@@ -105,14 +95,13 @@
                             type="textarea"
                             v-model="noticeForm.content"
                             :rows="10"
-                            placeholder="请输入公告内容"
-                            :readonly="isView">
+                            placeholder="请输入公告内容">
                     </el-input>
                 </el-form-item>
             </div>
 
             <!-- 添加底部按钮 -->
-            <el-form-item v-if="!isView">
+            <el-form-item>
                 <el-button type="primary" @click="handleSave">保存</el-button>
                 <el-button @click="handleClose">取消</el-button>
             </el-form-item>
@@ -126,15 +115,32 @@
         data() {
             return {
                 noticeForm: {
-                    visibility: '',
+                    type:'',
                     title: '',
-                    publisher: '',
+                    author: '',
                     content: ''
-                }
+                },
+
             }
         },
         methods: {
+            handleSave(){
+                axios({
+                    url: 'http://localhost:8080/notice/add',
+                    method: 'post',
+                    data:this.noticeForm,
+                }).then(res => {
+                    if(res.data.code == 200){
+                        this.tableData = res.data.data;
+                        location.href = 'notifFcation.html'
+                    }
+
+                }).catch(error => {
+
+                })
+            },
             handleClose() {
+
                 this.$confirm('确认关闭？未保存的内容将会丢失', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',

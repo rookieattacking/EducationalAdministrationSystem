@@ -11,6 +11,8 @@ import java.util.List;
 学生查询对应接口
  */
 public interface EasStudentService {
+
+    EasStudent selectOneByUsername(String username);
     /*
     查询所有
      */

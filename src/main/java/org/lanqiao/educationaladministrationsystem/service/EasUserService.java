@@ -1,18 +1,16 @@
 package org.lanqiao.educationaladministrationsystem.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.EasUserQuery;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.FuzzyQuery;
-import org.lanqiao.educationaladministrationsystem.pojo.EasRole;
 import org.lanqiao.educationaladministrationsystem.pojo.EasUser;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
-import org.lanqiao.educationaladministrationsystem.vo.EasUserVo.EasUserQueryVo;
 
 import java.util.List;
 
 public interface EasUserService {
+
     /* 登录 */
     EasUser login(String username,String password);
 

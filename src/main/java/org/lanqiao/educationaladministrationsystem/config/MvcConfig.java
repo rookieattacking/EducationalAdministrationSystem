@@ -12,12 +12,13 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         LoginInterceptor loginInterceptor = new LoginInterceptor();
         // 登录拦截器
-        registry.addInterceptor(loginInterceptor)    // "/needLogin.html",
+        registry.addInterceptor(loginInterceptor)
                 //放行
                 .excludePathPatterns(
                         "/login.html",
                         "/register.html",
                         "/code",
+                        "/code2",
                         "/register",
                         "/login",
                         "/css/*",

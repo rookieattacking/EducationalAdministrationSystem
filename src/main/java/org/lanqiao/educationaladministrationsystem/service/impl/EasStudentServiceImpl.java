@@ -17,9 +17,18 @@ public class EasStudentServiceImpl implements EasStudentService {
     @Autowired
     private EasStudentMapper easStudentMapper;
 
+    @Override
+    public EasStudent selectOneByUsername(String username) {
+        EasStudent easStudent = easStudentMapper.selectOneByUsername(username);
+        if(easStudent != null){
+            return easStudent;
+        }
+        return null;
+    }
+
     /*
-    查询所有操作
-     */
+        查询所有操作
+         */
     @Override
     public List<EasStudent> selectAll() {
         List<EasStudent> student=easStudentMapper.selectAll();

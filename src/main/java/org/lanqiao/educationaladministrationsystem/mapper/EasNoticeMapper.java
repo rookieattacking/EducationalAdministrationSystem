@@ -13,7 +13,8 @@ public interface EasNoticeMapper {
 
     // List<EasNotice> getNoticeListByType(@Param("type")int type, @Param("searchKey") String searchKey, @Param("pageUtil") PageUtil pageUtil);
 
-    int addNotice(EasNotice easNotice);
+
+
 
     int updateNotice(EasNotice easNotice);
 
@@ -32,6 +33,9 @@ public interface EasNoticeMapper {
     /* 获取所有的通知 */
     @Select("select * from eas_notice")
     List<EasNotice> getAllList();
+
+    /* 添加通知 */
+    int addNotice(EasNotice easNotice);
 
 
     @Select("select * from eas_notice  where  title LIKE CONCAT('%', #{title}, '%')")

@@ -11,6 +11,12 @@ import java.util.List;
 @Mapper
 public interface EasUserMapper {
 
+
+    @Select("select * from eas_user where username = #{username}")
+    EasUser selectEasUser(String username);
+    @Update("update eas_user set locked = #{locked} where id = #{id}")
+    void updateEasUser(String locked,Long id);
+
     /* 登录 */
     EasUser login(String username,String password);
 

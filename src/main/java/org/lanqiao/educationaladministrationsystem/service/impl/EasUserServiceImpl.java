@@ -3,7 +3,7 @@ package org.lanqiao.educationaladministrationsystem.service.impl;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.EasUserQuery;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.FuzzyQuery;
 import org.lanqiao.educationaladministrationsystem.mapper.EasUserMapper;
-import org.lanqiao.educationaladministrationsystem.pojo.EasRole;
+
 import org.lanqiao.educationaladministrationsystem.pojo.EasUser;
 import org.lanqiao.educationaladministrationsystem.service.EasUserService;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
@@ -14,9 +14,11 @@ import java.util.List;
 
 
 @Service
+
 public class EasUserServiceImpl implements EasUserService {
     @Autowired
     private EasUserMapper easUserMapper;
+
     /* 登录 */
     @Override
     public EasUser login(String username, String password) {
