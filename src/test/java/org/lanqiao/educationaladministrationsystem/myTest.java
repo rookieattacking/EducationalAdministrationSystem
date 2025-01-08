@@ -3,6 +3,7 @@ package org.lanqiao.educationaladministrationsystem;
 import org.junit.jupiter.api.Test;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.EasUserQuery;
 import org.lanqiao.educationaladministrationsystem.dto.EasUser.FuzzyQuery;
+import org.lanqiao.educationaladministrationsystem.mapper.EasBaseCourseMapper;
 import org.lanqiao.educationaladministrationsystem.mapper.EasClassMapper;
 import org.lanqiao.educationaladministrationsystem.mapper.EasUserMapper;
 import org.lanqiao.educationaladministrationsystem.pojo.EasClass;
@@ -26,16 +27,12 @@ public class myTest {
     @Autowired
     private EasUserMapper easUserMapper;
     @Autowired
+    private EasBaseCourseMapper easBaseCourseMapper;
+    @Autowired
     private EasRoleService easRoleService;
     @Test
     public void test1(){
-        int offSet = (1 - 1) * 10;
-        // EasClassFuzzyQuery admin = new EasClassFuzzyQuery();
-        // List<EasClassFuzzyQuery> easUserQueryList = easUserMapper.fuzzyPageList(admin,  offSet);
-
-        List<EasClass> easClasses = easClassMapper.easClassList(1, 5, offSet);
-        for (EasClass easClass : easClasses) {
-            System.out.println(easClass);
-        }
+        int baseCourseId = easBaseCourseMapper.getBaseCourseId("数据结构与算法");
+        System.out.println(baseCourseId);
     }
 }

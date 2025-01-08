@@ -29,10 +29,7 @@
     id, start_date, end_date, class_hour, test_mode, student_num, choice_num, t_id, base_course_id
     </sql>
 
-    <!--添加 -->
-    <insert id="addCourse" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
-        insert into eas_course values (null,#{startDate},#{endDate},#{classHour}${testMode},#{studentNum},0,0,#{tId},#{baseCourseId})
-    </insert>
+
 
     <!-- 加入if判断日期!=null 会更新失败-->
     <update id="updateCourseById" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
@@ -88,9 +85,14 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
+
+
+
+
+    <!--批量删除-->
     <delete id="batchDeleteCourse" parameterType="java.lang.reflect.Array">
         delete from eas_course where id in
-        <foreach collection="array" item="item" open="(" close=")" separator=",">
+        <foreach collection="dis" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
     </delete>
@@ -308,7 +310,7 @@
 
     <!--分页查询-->
     <select id="getPageList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery" resultMap="BaseResultMap">
-        select c.id id,c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
+        select c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
         limit #{offSet},#{pageSize}
     </select>
 
@@ -332,7 +334,7 @@
 
     <!--模糊查询分页-->
     <select id="getFuzzyPageList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery" resultMap="BaseResultMap">
-        select c.id id,c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
+        select c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id
         <where>
             <if test="easeCourseFuzzyQuery.coursename != null and easeCourseFuzzyQuery.coursename != ''">
                 coursename like CONCAT ('%',#{easeCourseFuzzyQuery.coursename},'%')
@@ -343,6 +345,14 @@
         </where>
     limit #{offSet},#{easeCourseFuzzyQuery.pageSize}
     </select>
+
+
+    <!--添加 -->
+    <insert id="addCourse" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
+        insert into eas_course (start_date, end_date, class_hour, test_mode, student_num, choice_num, complete, t_id, base_course_id)
+        values (#{startDate}, #{endDate}, #{classHour}, #{testMode}, #{studentNum}, 0, 0, #{tId}, #{baseCourseId})
+    </insert>
+
 
 
 </mapper>

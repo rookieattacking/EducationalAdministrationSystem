@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.cors.reactive.PreFlightRequestWebFilter;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,7 +83,6 @@ public class EasCourseController {
 
     @RequestMapping("/newAdd")
     public ResponseUtil newAdd(@RequestBody EasCourseQuery easCourseQuery){
-        System.out.println(easCourseQuery);
         /**
          *  1.先使用EasCourseQuery 实体类来接收用户输入的信息
          *  2.添加的时候，根据教师名查询出对应的Id和课程id之后在添加到eas_course这张中
@@ -91,29 +91,61 @@ public class EasCourseController {
          *  1. 先根据课程名和教师姓名分别查询出他们个自的id
          *  2.
          */
-        /* 查询出添加的课程id */
-        int baseCourseId = easBaseCourseService.getBaseCourseId(easCourseQuery.getCoursename());
-        // System.out.println(baseCourseId);
-        String startDate = easCourseQuery.getStartDate();
-        String endDate = easCourseQuery.getEndDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        /* 查询出的教师id */
-        int teacherId = easTeacherService.getTeacherId(easCourseQuery.getCoursename());
-        /* 添加 */
-        // String startDate = easCourseQuery.getStartDate();
-        // String endDate = easCourseQuery.getEndDate();
-        Integer classHour = easCourseQuery.getClassHour();
-        String testMode = easCourseQuery.getTestMode();
-        Integer studentNum = easCourseQuery.getStudentNum();
+        try {
+            /* 查询出添加的课程id */
+            int baseCourseId = easBaseCourseService.getBaseCourseId(easCourseQuery.getCoursename());
+            // 创建一个 ZonedDateTime 对象
+            ZonedDateTime zonedDateTime = ZonedDateTime.parse(easCourseQuery.getStartDate());
+            ZonedDateTime zonedDateTime2 = ZonedDateTime.parse(easCourseQuery.getEndDate());
+            // 定义日期时间格式化器，格式为 YYYY-MM-dd
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            /* 将时间转换成我们想要的 */
+            String startDate = new String(zonedDateTime.format(formatter));
+            String endDate = new String(zonedDateTime2.format(formatter));
 
-        int result = easCourseService.addCourse(new EasCourse(startDate, endDate, classHour, testMode, studentNum, teacherId, baseCourseId));
-        if(result > 0 ){
-            return new ResponseUtil(200,"添加成功");
-        }else{
-            return new ResponseUtil(305,"添加失败");
+            /* 查询出的教师id */
+            int teacherId = easTeacherService.getTeacherId(easCourseQuery.getUsername());
+            /* 添加 */
+            int classHour = easCourseQuery.getClassHour();
+            String testMode = easCourseQuery.getTestMode();
+            int studentNum = easCourseQuery.getStudentNum();
+            int result = easCourseService.addCourse(new EasCourse(startDate, endDate, classHour, testMode, studentNum, teacherId, baseCourseId));
+            if(result > 0 ){
+                return new ResponseUtil(200,"添加成功");
+            }else{
+                return new ResponseUtil(305,"添加失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseUtil(500,"添加失败");
         }
 
     }
+
+
+    /* 根据id删除 */
+    @RequestMapping("/deleteById")
+    public ResponseUtil deleteById(@RequestBody EasCourse easCourse){
+        int result = easCourseService.deleteById(easCourse.getId());
+        if(result > 0){
+            return new ResponseUtil(200,"删除成功");
+        }else {
+            return new ResponseUtil(305,"删除失败");
+        }
+    }
+
+    /* 批量删除 */
+
+    @RequestMapping("/deleteByids")
+    public ResponseUtil deleteByids(@RequestBody Integer[] ids){
+        int result = easCourseService.batchDeleteCourse(ids);
+        if(result > 0){
+            return new ResponseUtil(200,"删除成功");
+        }else {
+            return new ResponseUtil(305,"删除失败");
+        }
+    }
+
 
 
 }

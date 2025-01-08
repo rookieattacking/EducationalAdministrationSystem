@@ -153,16 +153,7 @@
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
 
-                tableData: [{
-                    id:'1',
-                    coursename: '王小虎',
-                    testMode:"",
-                    studentNum:"",
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    choiceNum:'',
-                }],
+                tableData: [],
             }
         },
         methods:{
@@ -236,32 +227,11 @@
                 })
             },
 
-            deleteByIds(){
-                /*todo：批量删除*/
-                console.log(this.ids)
-
-            },
-            // 添加
-            add(){
-                location.href = 'addCourse.html'
-            },
-            // 处理编辑按钮点击时显示的内容
-            handleEdit(row) {
-                this.dialogType = 'edit';
-                this.dialogVisible = true;
-                // 复制数据到编辑表单
-                // this.form = {
-                //     coursename: row.coursename,
-                //     synopsis: row.synopsis,
-                // };
-                alert(111)
-            },
 
             // 表格多选框选中事件
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-
 
             // 全选
             handleSelectAll(selection) {
@@ -277,11 +247,6 @@
             // 清空选择
             clearSelection() {
                 this.$refs.table.clearSelection();
-            },
-            // 删除操作(单个删除）
-            handleDelete(index, row) {
-                // todo:根据id删除
-                console.log(row.id)
             },
         },
         mounted(){

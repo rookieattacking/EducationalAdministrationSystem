@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>修改课程</title>
+    <title>添加课程</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="../js/Vue.main.js"></script>
     <script src="../js/index.js"></script>
@@ -58,79 +58,72 @@
     </style>
 </head>
 <body>
+
 <div id="app">
     <div class="course-container">
         <!-- 标题和关闭按钮 -->
         <div class="header">
-            <div class="title">修改课程</div>
+            <div class="title">编辑课程</div>
             <i class="el-icon-close close-btn" @click="handleClose"></i>
         </div>
 
         <!-- 表单内容 -->
         <div class="course-form">
             <el-form :model="courseForm" ref="courseForm" label-width="100px">
-            <!-- 第一行：课程和任课教师 -->
-            <div class="form-row">
-                <el-form-item label="课程" class="form-item">
-                    <el-select v-model="courseForm.baseCourseId" placeholder="请选择课程">
-                        <el-option
-                                v-for="item in baseCourseOptions"
-                                :key="item.id"
-                                :label="item.coursename"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+                <!-- 第一行：课程和任课教师 -->
+                <div class="form-row">
+                    <el-form-item label="课程" class="form-item">
+                        <el-select v-model="courseForm.coursename" placeholder="请选择课程" clearable>
+                            <el-option
+                                    v-for="item in baseCourseOptions"
+                                    :key="item.id"
+                                    :label="item.coursename"
+                                    :value="item.coursename">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
 
-                <el-form-item label="任课教师" class="form-item">
-                    <el-select v-model="courseForm.tId" placeholder="请选择教师">
-                        <el-option
-                                v-for="item in teacherOptions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-            </div>
+                    <el-form-item label="任课教师" class="form-item">
+                        <el-select v-model="courseForm.username" placeholder="请选择教师" clearable>
+                            <el-option
+                                    v-for="item in teacherOptions"
+                                    :key="item.id"
+                                    :label="item.username"
+                                    :value="item.username">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </div>
 
-            <!-- 第二行：开始时间和结束时间 -->
+
             <div class="form-row">
                 <el-form-item label="开始时间" class="form-item">
-                    <el-date-picker
-                            v-model="courseForm.startDate"
-                            type="date"
-                            placeholder="选择开始日期">
-                    </el-date-picker>
+                    <el-input v-model="courseForm.startDate" placeholder="开始时间"></el-input>
                 </el-form-item>
 
                 <el-form-item label="结束时间" class="form-item">
-                    <el-date-picker
-                            v-model="courseForm.endDate"
-                            type="date"
-                            placeholder="选择结束日期">
-                    </el-date-picker>
+                    <el-input v-model="courseForm.endDate" placeholder="结束时间"></el-input>
                 </el-form-item>
+
             </div>
 
             <!-- 第三行：课时和考核方式 -->
             <div class="form-row">
                 <el-form-item label="课时" class="form-item">
-                    <el-input v-model="courseForm.classHour" placeholder="请输入课时"></el-input>
+                    <el-input v-model="courseForm.classHour" placeholder="课时"></el-input>
                 </el-form-item>
 
                 <el-form-item label="考核方式" class="form-item">
-                    <el-input v-model="courseForm.testMode" placeholder="请输入考核方式"></el-input>
+                    <el-input v-model="courseForm.testMode" placeholder="考核方式"></el-input>
                 </el-form-item>
             </div>
 
             <!-- 第四行：人数 -->
             <div class="form-row">
                 <el-form-item label="人数" class="form-item">
-                    <el-input v-model="courseForm.studentNum" placeholder="请输入人数"></el-input>
+                    <el-input v-model="courseForm.studentNum" placeholder="人数"></el-input>
                 </el-form-item>
             </div>
-
             <!-- 按钮组 -->
             <div style="text-align: center; margin-top: 30px;">
                 <el-button type="primary" @click="submitForm">提交</el-button>
@@ -141,16 +134,16 @@
     </div>
 </div>
 </div>
-
+</body>
 <script>
     new Vue({
         el: '#app',
         data() {
             return {
                 courseForm: {
-                    id: '', // 课程id
-                    tId: '',  //
-                    startDate: '',
+                    id:'',
+                    coursename:'',// 课程名
+                    username: '', // 教师名
                     endDate: '',
                     classHour: '',
                     testMode: '',
@@ -181,10 +174,25 @@
                     this.teacherOptions = res.data.data;
                 })
             },
-
             // 提交表单
+            /*添加课程信息*/
             submitForm() {
-               // todo:
+                // todo:
+                console.log(this.courseForm)
+                axios({
+                    url:'http://localhost:8080/easCourse/updateNew',
+                    method:'post',
+                    data:this.courseForm,
+                }).then(res =>{
+                    console.log(res.data)
+                    if(res.data.code == 200) {
+                        this.$message.success("修改成功");
+                    }else{
+                        this.$message.error("修改失败");
+                    }
+                }).catch(() =>{
+                    this.$message.error("修改失败");
+                })
             },
 
             // 重置表单
@@ -195,13 +203,20 @@
             // 关闭页面
             handleClose() {
                 location.href = 'courseManage.html'
+            },
+            fetchData() {
+                const storedData = sessionStorage.getItem("courseForm");
+                const parsedData = JSON.parse(storedData);
+                this.courseForm = { ...parsedData };
             }
         },
-        mounted(){
+        mounted() {
+            this.fetchData();
             this.getAllCourse();
             this.getTeacherList();
+
         }
+
     })
 </script>
-</body>
 </html>

@@ -189,12 +189,12 @@
                     method:'post',
                     data:this.courseForm,
                 }).then(res =>{
-                    // console.log(res.data)
-                    // if(res.data.code == 200) {
-                    //     this.$message.success("添加成功");
-                    // }else{
-                    //     this.$message.error("添加失败");
-                    // }
+                    console.log(res.data)
+                    if(res.data.code == 200) {
+                        this.$message.success("添加成功");
+                    }else{
+                        this.$message.error("添加失败");
+                    }
                 }).catch(() =>{
                     this.$message.error("添加失败");
                 })

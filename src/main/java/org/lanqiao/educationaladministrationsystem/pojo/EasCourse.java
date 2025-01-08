@@ -9,18 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EasCourse {
 
-  private long id;
+  private Integer id;
   private String startDate;
   private String endDate;
-  private long classHour;
+  private Integer classHour;
   private String testMode;
-  private long studentNum;
-  private long choiceNum;
-  private long complete;
-  private long tId;
-  private long baseCourseId;
+  private Integer studentNum;
+  private Integer choiceNum;
+  private Integer complete;
+  private Integer tId;
+  private Integer baseCourseId;
+  private Integer did;
 
-  public EasCourse(String startDate, String endDate, long classHour, String testMode, long studentNum, long tId, long baseCourseId) {
+  public EasCourse(String startDate, String endDate, Integer classHour, String testMode, Integer studentNum, Integer tId, Integer baseCourseId) {
     this.startDate = startDate;
     this.endDate = endDate;
     this.classHour = classHour;

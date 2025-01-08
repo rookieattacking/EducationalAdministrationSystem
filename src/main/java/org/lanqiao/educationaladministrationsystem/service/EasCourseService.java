@@ -1,5 +1,6 @@
 package org.lanqiao.educationaladministrationsystem.service;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery;
 import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EaseCourseFuzzyQuery;
@@ -16,6 +17,12 @@ public interface EasCourseService {
     PageHelperUtil<EasCourseQuery> getPageList(@Param("pageNum") int pageNum,
                                      @Param("pageSize") int pageSize
     );
+
+    /* 批量删除 */
+    int batchDeleteCourse(Integer[] ids);
+
+    /* 根据id删除 */
+    int deleteById(Integer id);
 
 
     /* 模糊查询 */

@@ -1,5 +1,6 @@
 package org.lanqiao.educationaladministrationsystem.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.lanqiao.educationaladministrationsystem.pojo.EasCourse;
 import org.lanqiao.educationaladministrationsystem.pojo.EasScore;
@@ -24,4 +25,5 @@ public interface EasScoreMapper {
 
 
     String getStartDateByCourseId(Integer courseId);
+
 }

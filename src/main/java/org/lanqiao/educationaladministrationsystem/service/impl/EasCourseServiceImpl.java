@@ -44,6 +44,27 @@ public class EasCourseServiceImpl implements EasCourseService {
         return pageHelper;
     }
 
+    /* 批量删除 */
+    @Override
+    public int batchDeleteCourse(Integer[] ids) {
+        int result = easCourseMapper.batchDeleteCourse(ids);
+        if(result > 0){
+            return result;
+        }
+        return 0;
+    }
+
+
+    /* 根据id删除 */
+    @Override
+    public int deleteById(Integer id) {
+        int result = easCourseMapper.deleteById(id);
+        if(result > 0){
+            return result;
+        }
+        return 0;
+    }
+
 
     /* 模糊查询 */
     @Override

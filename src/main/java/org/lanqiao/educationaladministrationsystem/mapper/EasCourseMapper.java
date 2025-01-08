@@ -1,5 +1,6 @@
 package org.lanqiao.educationaladministrationsystem.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery;
@@ -24,7 +25,7 @@ public interface EasCourseMapper {
 
     int updateDate(@Param("id") Integer id, @Param("startDate") Date startDate, @Param("endDate") java.sql.Date endDate);
 
-    int batchDeleteCourse(Integer[] ids);
+
 
     int getCountBytId(Integer tId);
 
@@ -50,6 +51,13 @@ public interface EasCourseMapper {
 
     /* 添加  */
     int addCourse(EasCourse easCourse);
+
+    /* 批量删除 */
+    int batchDeleteCourse(Integer[] ids);
+
+    /* 单个删除 */
+    @Delete("delete from eas_course where id = #{id}")
+    int deleteById(Integer id);
 
 
     /* 分页查询计算总行数 */

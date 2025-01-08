@@ -208,16 +208,7 @@
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
 
-                tableData: [{
-                    id:'1',
-                    coursename: '王小虎',
-                    testMode:"",
-                    studentNum:"",
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    choiceNum:'',
-                }],
+                tableData: [],
             }
         },
         methods:{
@@ -292,7 +283,6 @@
             },
 
             deleteByIds(){
-                /*todo：批量删除*/
                 this.$confirm('确认删除已选择的?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -325,7 +315,8 @@
             handleEdit(row) {
                 courseForm ={
                     id:row.id,
-                    tId:this.tableData.tId,
+                    username:row.username,
+                    coursename:row.coursename,
                     startDate:row.startDate,
                     endDate:row.endDate,
                     classHour:row.classHour,
@@ -333,7 +324,9 @@
                     studentNum:row.studentNum,
                 }
                 console.log(courseForm)
-                // sessionStorage.setItem('courseForm',)
+                sessionStorage.setItem('courseForm',JSON.stringify(courseForm));
+                location.href = 'updateCourse.html';
+
             },
 
             // 表格多选框选中事件
@@ -373,6 +366,7 @@
                     }).then(res =>{
                         if(res.data.code == 200){
                             this.$message.success("删除成功");
+                            this.fetchData();
                         }
                     }).catch(err =>{
                         console.error('删除失败:', err);
