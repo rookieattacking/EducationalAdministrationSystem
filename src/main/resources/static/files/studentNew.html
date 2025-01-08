@@ -7,8 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="js/Vue.main.js"></script>
-    <script src="js/index.js"></script>
+    <script src="../js/Vue.main.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/axios.js"></script>
 </head>
 <body>
 <div id="app">
@@ -57,10 +58,10 @@
                     width="150">
             </el-table-column>
             <el-table-column
-                    prop="classname"
+                    prop="classes"
                     label="班级"
                     sortable
-                    width="150">
+                    width="200">
             </el-table-column>
             <el-table-column
                     prop="motto"
@@ -71,59 +72,56 @@
     </template>
 </div>
 </body>
-    <script>
-        new Vue({
-            el:'#app',
-            method:'post',
-            data(){
-                return{
-                    formInline: {
-                        name: '',
-                        phone:'',
-                        region: ''
-                    },
-                    tableData: [{
-                        id:'1',
-                        username:'lll',
-                        birthday: '2016-05-02',
-                        name: '王小虎',
-                        classname:"",
-                        phone:'124343444',
-                    }, {
-                        id:'2',
-                        username:'ww',
-                        classname:"",
-                        phone:'124343444',
-                        birthday: '2016-05-04',
-                        name: '王小虎',
-                        motto:'',
-                    }, {
-                        id:"3",
-                        username:'nnn',
-                        classname:"",
-                        phone:'124343444',
-                        birthday: '2016-05-01',
-                        name: '王小虎',
-                        motto:'',
-                    }, {
-                        id:'4',
-                        username:'xx',
-                        phone:'124343444',
-                        birthday: '2016-05-03',
-                        classname:"",
-                        motto:'',
-                        name: '王小虎',
-                    }]
-                }
-            },
-            methods:{
-                onSubmit() {
-                    console.log('submit!');
+<script>
+    new Vue({
+        el:'#app',
+        method:'post',
+        data(){
+            return{
+                formInline: {
+                    name: '',
+                    classes:'',
                 },
-                formatter(row, column) {
-                    return row.address;
-                }
+                dialogVisible: false,
+                /*修改时的返回数据*/
+                updateForm: {
+                    username:'',
+                    name:'',
+                    sex:'',
+                    birthday: '',
+                    phone:'',
+                    classes: ''
+                },
+                pageNum: 1,        // 当前页码
+                pageSize: 5,      // 每页显示条数
+                total: 0,          // 总条数
+                tableData: [
+                    {
+                        id:'1',
+                        username:'22',
+                        name:'22',
+                        sex:'xx',
+                        birthday: 'ss',
+                        phone: 'how',
+                        classes:'22',
+                        motto:'www'
+
+                    }
+
+                ]
             }
-        })
-    </script>
+        },
+        methods: {
+
+            // 关闭按钮
+            handleClose(done) {
+                done();
+            },
+
+            mounted() {
+                this.onSubmit();
+            }
+        }
+    })
+</script>
 </html>

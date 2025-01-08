@@ -68,9 +68,11 @@ public class EasBaseCourseServiceImpl implements EasBaseCourseService {
         }
     }
 
+
+
     /* 根据id单个删除 */
     @Override
-    public int getBaseCourseById(EasBaseCourse easBaseCourse) {
+    public int deleteById(EasBaseCourse easBaseCourse) {
         int result = easBaseCourseMapper.deleteById(easBaseCourse);
         if(result > 0){
             return result;
@@ -87,5 +89,37 @@ public class EasBaseCourseServiceImpl implements EasBaseCourseService {
             return result;
         }
         return 0;
+    }
+
+
+    /*  查询出所有的基本课程信息 */
+    @Override
+    public List<EasBaseCourse> courseList() {
+        List<EasBaseCourse> easBaseCourse = easBaseCourseMapper.courseList();
+        if(easBaseCourse != null){
+            return easBaseCourse;
+        }
+        return null;
+    }
+
+    /* 新添加基本课程信息 */
+    @Override
+    public int addNewBaseCourse(String cousername) {
+        int result = easBaseCourseMapper.addNewBaseCourse(cousername);
+        if(result > 0){
+            return result;
+        }
+        return 0;
+    }
+
+    /* 根据基本课程名获取基本课程的id */
+    @Override
+    public int getBaseCourseId(String coursename) {
+        int baseCourseId = easBaseCourseMapper.getBaseCourseId(coursename);
+        if(baseCourseId != 0){
+            return baseCourseId;
+        }else {
+            return 0;
+        }
     }
 }

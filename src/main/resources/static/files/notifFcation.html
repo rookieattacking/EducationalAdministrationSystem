@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,10 +9,10 @@
     <!-- 引入 Element UI CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <!-- 引入 Vue -->
-    <script src="js/Vue.main.js"></script>
+    <script src="../js/Vue.main.js"></script>
     <!-- 引入 Element UI -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <script src="js/axios.js"></script>
+    <script src="../js/axios.js"></script>
 </head>
 
 <body>
@@ -92,9 +92,6 @@
                             @click="handleView(scope.row)">查看</el-button>
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.row)">编辑</el-button>
-                    <el-button
-                            size="mini"
                             type="danger"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
@@ -141,6 +138,21 @@
             onSubmit() {
                 // todo:模糊查询
                 // console.log(this.formInline.user)
+                axios({
+                    url: 'http://localhost:8080/notice/like',
+                    method: 'post',
+                    data: {
+                        title: this.formInline.title,  // 传递查询条件
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.tableData = res.data.data;  // 将返回的结果赋给表格数据
+                    } else {
+                        console.error('查询失败:', res.data.message);
+                    }
+                }).catch(error => {
+                    console.error('请求失败', error);
+                });
 
             },
             openNew(){
@@ -149,20 +161,53 @@
             // 批量删除
             deleteByTitle(){
                 // todo
+                this.$confirm('确认删除已选择的用户?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url: 'http://localhost:8080/notice/deletlist',
+                        method: 'post',
+                        data:this.ids,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success('删除成功');
+                            this.queryAll();
+                        } else {
+                            this.$message.error(res.data.msg || '删除失败');
+                        }
+                    }).catch(err => {
+                        console.error('删除失败:', err);
+                        this.$message.error('删除失败');
+                    });
+                }).catch(() => {
+
+                });
             },
             // 查看公告
             handleView(row) {
                 location.href = `noticeInfo.html?id=${row.id}`;
             },
-            // 编辑公告
-            handleEdit(row) {
-                // todo：编辑公告
-                // location.href = 'node.html';
-            },
             // 删除公告
             handleDelete(index,row){
                 // todo：根据id删除
                 // console.log( row.id)
+                axios({
+                    url: `http://localhost:8080/notice/delete/${row.id}`,  // 使用 URL 参数传递 ID
+                    method: 'delete',  // 使用 DELETE 方法
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        // 删除成功，更新表格数据
+                        this.tableData = res.data.data;  // 更新表格数据
+                        this.queryAll();  // 如果需要重新获取数据
+                    }
+                }).catch(error => {
+                    // 错误处理
+                    console.error("删除失败：", error);
+                    // 可以弹出提示框或者其他错误处理
+                    alert("删除失败，请稍后重试！");
+                });
             },
             // 表格多选框选中事件
             handleSelectionChange(val) {

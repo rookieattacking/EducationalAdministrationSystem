@@ -14,6 +14,9 @@ public interface EasUserMapper {
     /* 登录 */
     EasUser login(String username,String password);
 
+    /* 注册 */
+    int register(EasUser easUser);
+
 
     /* 分页查询 */
     List<EasUserQuery> pageList(
@@ -72,7 +75,6 @@ public interface EasUserMapper {
     /* 修改密码 */
     @Update("update eas_user set password = #{password} where id = #{easUser.id}")
     int updatePassword(@Param("easUser") EasUser easUser, @Param("password") String password);
-
 
 
 }

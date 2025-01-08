@@ -1,6 +1,7 @@
 package org.lanqiao.educationaladministrationsystem.service;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.lanqiao.educationaladministrationsystem.dto.EasBaseCourse.FuzzyQueryCourse;
 import org.lanqiao.educationaladministrationsystem.pojo.EasBaseCourse;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
@@ -29,8 +30,20 @@ public interface EasBaseCourseService {
     int addBaseCourse(@Param("easBaseCourse") EasBaseCourse easBaseCourse);
 
     /* 根据id单个删除 */
-    int getBaseCourseById(EasBaseCourse easBaseCourse);
+    int deleteById(EasBaseCourse easBaseCourse);
 
     /* 批量删除 */
     int batchDeleteBaseCourse(@Param("ids") Integer[] ids);
+
+
+    /*  查询出所有的基本课程信息 */
+    List<EasBaseCourse> courseList();
+
+
+    /* 新添加基本课程信息 */
+    int addNewBaseCourse(String cousername);
+
+
+    /* 根据基本课程名获取基本课程的id */
+    int getBaseCourseId(String coursename);
 }

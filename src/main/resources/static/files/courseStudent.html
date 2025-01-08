@@ -1,26 +1,62 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>主页</title>
+    <!-- 引入 Element UI CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="js/Vue.main.js"></script>
-    <script src="js/index.js"></script>
-    <script src="js/axios.js"></script>
+    <!-- 引入 Vue -->
+    <script src="../js/Vue.main.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="../js/index.js"></script>
+    <!-- 引入 axios -->
+    <script src="../js/axios.js"></script>
+
 </head>
+<style>
+    .multi-line-ellipsis {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2; /* 显示行数 */
+        overflow: hidden;
+        line-height: 1.5;
+        max-height: 3em; /* line-height * 显示行数 */
+    }
+</style>
 <body>
 <div id="app">
+    <!--输入搜索框-->
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="课程名称">
             <el-input v-model="formInline.coursename" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="课程简介">
+            <el-input v-model="formInline.synopsis" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
         </el-form-item>
     </el-form>
+
+    <el-dialog
+            :title="dialogType === 'add' ? '添加基本课程' : '修改基本课程'"
+            :visible.sync="dialogVisible"
+            width="30%"
+            @close="handleClose">
+        <el-form ref="updateForm" :model="updateForm" label-width="80px">
+            <el-form-item label="课程名称">
+                <el-input v-model="updateForm.coursename"></el-input>
+            </el-form-item>
+            <el-form-item label="课程简介">
+                <el-input v-model="updateForm.synopsis" type="textarea"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="handleSubmit">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
 
     <!--表格-->
     <template>
@@ -33,8 +69,7 @@
                 style="width: 100%">
             <!--id-->
             <el-table-column
-                    label="课程编号"
-                    sortable
+                    label="ID"
                     width="180">
                 <template slot-scope="scope">
                     <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -43,7 +78,7 @@
             <!--课程名称-->
             <el-table-column
                     label="课程名称"
-                    width="180">
+                    width="290">
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
                         <p>课程名称: {{ scope.row.coursename }}</p>
@@ -53,63 +88,15 @@
                     </el-popover>
                 </template>
             </el-table-column>
-            <!--任课教师-->
-            <el-table-column
-                    label="任课教师"
-                    width="180">
-                <template slot-scope="scope">
-                    <el-popover trigger="hover" placement="top">
-                        <p>任课教师: {{ scope.row.username }}</p>
-                        <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.username }}</el-tag>
-                        </div>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <!--开始时间 -->
-            <el-table-column
-                    label="开始时间"
-                    width="180">
-                <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.startDate }}</span>
-                </template>
-            </el-table-column>
-            <!--结束时间-->
-            <el-table-column
-                    label="结束时间"
-                    width="180">
-                <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.endDate }}</span>
-                </template>
-            </el-table-column>
 
-            <!--课时-->
+            <!--课程简介-->
             <el-table-column
-                    label="课时"
-                    width="180">
+                    label="课程简介"
+                    width="250">
                 <template slot-scope="scope">
-                    <el-popover trigger="hover" placement="top">
-                        <p>课时: {{ scope.row.classHour }}</p>
-                        <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.classHour }}</el-tag>
-                        </div>
-                    </el-popover>
-                </template>
-            </el-table-column>
-
-            <!--考核方式-->
-            <el-table-column
-                    label="考核方式"
-                    width="180">
-                <template slot-scope="scope">
-                    <el-popover trigger="hover" placement="top">
-                        <p>考核方式: {{ scope.row.testMode }}</p>
-                        <div slot="reference" class="name-wrapper">
-                            <el-tag size="medium">{{ scope.row.testMode }}</el-tag>
-                        </div>
-                    </el-popover>
+                    <el-tooltip class="item" effect="dark" :content="scope.row.synopsis" placement="top">
+                        <div class="multi-line-ellipsis">{{ scope.row.synopsis }}</div>
+                    </el-tooltip>
                 </template>
             </el-table-column>
         </el-table>
@@ -126,57 +113,45 @@
             :total="total">
     </el-pagination>
 
+
 </div>
-</body>
+
 <script>
     new Vue({
-        el:"#app",
+        el: '#app',
         method:"post",
-        data(){
-            return{
+        data() {
+            return {
                 formInline: {
                     coursename: '',
-                    teachername: ''
+                    synopsis:''
                 },
                 pageNum: 1,        // 当前页码
                 pageSize: 5,      // 每页显示条数
                 total: 0,          // 总条数
-                // ... 其他数据
                 multipleSelection: [], // 存储选中的行
                 /*批量删除*/
                 ids:[],
                 /*修改时的返回数据*/
-                form: {
+                updateForm: {
                     coursename: '',
                     synopsis: '',
                 },
                 // 添加一个变量区分是添加还是编辑
                 dialogType: 'add', // 'add' 或 'edit'
-
-                tableData: [{
-                    id:'1',
-                    coursename: '王小虎',
-                    testMode:"",
-                    studentNum:"",
-                    synopsis:"admin",
-                    startDate: '2016-05-02',
-                    endDate: '2016-05-02',
-                    choiceNum:'',
-                }],
+                dialogVisible: false,
+                // 页面中表格显示的内容
+                tableData: [],
             }
         },
-        methods:{
-            // 关闭按钮
-            handleClose(done) {
-                done();
-            },
+        methods: {
             // 统一的数据获取方法
             fetchData() {
                 // 如果有查询条件，使用模糊查询
-                if (this.formInline.username || this.formInline.coursename) {
+                if (this.formInline.coursename || this.formInline.synopsis) {
                     this.onSubmit();
                 } else {
-                    this.getPageList();
+                    this.getAll();
                 }
             },
             // 处理每页显示条数变化
@@ -190,9 +165,21 @@
                 this.pageNum = val;
                 this.fetchData();
             },
-            getPageList(){
+            // 关闭按钮
+            handleClose(done) {
+                this.updateForm = {
+                    coursename: '',
+                    synopsis: '',
+                    id:'',
+                };
+                this.ids =[];
+                this.multipleSelection = [];
+                done();
+            },
+            // 获取表格数据
+            getAll(){
                 axios({
-                    url:'http://localhost:8080/easCourse/pageList',
+                    url:'http://localhost:8080/baseCourse/getAll',
                     method:'post',
                     data:{
                         pageNum:this.pageNum,
@@ -209,17 +196,18 @@
 
                 })
             },
+            // 模糊查询
             onSubmit() {
                 // 重置页码到第一页
                 this.pageNum = 1;
                 axios({
-                    url:'http://localhost:8080/easCourse/fuzzyPageList',
+                    url:'http://localhost:8080/baseCourse/fuzzyQuery',
                     method:'post',
                     data:{
-                        coursename:this.formInline.coursename,
-                        username: this.formInline.username,
-                        pageNum:this.pageNum,
-                        pageSize:this.pageSize,
+                        coursename: this.formInline.coursename,
+                        synopsis: this.formInline.synopsis,
+                        pageNum: this.pageNum,
+                        pageSize: this.pageSize,
                     }
                 }).then(res =>{
                     if(res.data.code == 200){
@@ -236,57 +224,31 @@
                 })
             },
 
-            deleteByIds(){
-                /*todo：批量删除*/
-                console.log(this.ids)
-
-            },
-            // 添加
-            add(){
-                location.href = 'addCourse.html'
-            },
-            // 处理编辑按钮点击时显示的内容
-            handleEdit(row) {
-                this.dialogType = 'edit';
-                this.dialogVisible = true;
-                // 复制数据到编辑表单
-                // this.form = {
-                //     coursename: row.coursename,
-                //     synopsis: row.synopsis,
-                // };
-                alert(111)
-            },
-
             // 表格多选框选中事件
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
 
-
             // 全选
             handleSelectAll(selection) {
                 this.multipleSelection = selection;
-                this.ids = selection.map(item => item.id);
+                this.ids = this.multipleSelection.map(item => item.id);
             },
 
             // 单选
             handleSelect(selection, row) {
                 this.multipleSelection = selection;
-                this.ids = selection.map(item => item.id);
+                this.ids = this.multipleSelection.map(item => item.id);
             },
             // 清空选择
             clearSelection() {
                 this.$refs.table.clearSelection();
             },
-            // 删除操作(单个删除）
-            handleDelete(index, row) {
-                // todo:根据id删除
-                console.log(row.id)
-            },
         },
-        mounted(){
-            this.getPageList();
+        mounted() {
+            this.fetchData();
         }
     })
 </script>
+</body>
 </html>

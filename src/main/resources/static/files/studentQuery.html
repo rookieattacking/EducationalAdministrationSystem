@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="../js/Vue.main.js"></script>
+    <script src="../js/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--表格-->
+    <template>
+        <el-table
+                :data="tableData"
+                stripe
+                style="width: 100%"
+                :default-sort = "{prop: 'date', order: 'descending'}">
+            <!--id-->
+            <el-table-column
+                    prop="id"
+                    label="ID"
+                    width="120">
+            </el-table-column>
+            <!--用户名-->
+            <el-table-column
+                    prop="username"
+                    label="用户名"
+                    sortable
+                    width="150">
+            </el-table-column>
+            <!--姓名 -->
+            <el-table-column
+                    prop="name"
+                    label="姓名"
+                    width="150">
+            </el-table-column>
+            <!--性别-->
+            <el-table-column
+                    prop="sex"
+                    label="性别"
+                    width="150">
+            </el-table-column>
+            <!--生日-->
+            <el-table-column
+                    prop="birthday"
+                    label="生日"
+                    width="150">
+            </el-table-column>
+            <!--电话-->
+            <el-table-column
+                    prop="phone"
+                    label="电话"
+                    width="150">
+            </el-table-column>
+            <el-table-column
+                    prop="classname"
+                    label="班级"
+                    sortable
+                    width="150">
+            </el-table-column>
+            <el-table-column
+                    prop="motto"
+                    label="座右铭"
+                    width="150">
+            </el-table-column>
+        </el-table>
+    </template>
+</div>
+</body>
+    <script>
+        new Vue({
+            el:'#app',
+            method:'post',
+            data(){
+                return{
+                    formInline: {
+                        name: '',
+                        phone:'',
+                        region: ''
+                    },
+                    tableData: [{
+                        id:'1',
+                        username:'lll',
+                        birthday: '2016-05-02',
+                        name: '王小虎',
+                        classname:"",
+                        phone:'124343444',
+                    }, {
+                        id:'2',
+                        username:'ww',
+                        classname:"",
+                        phone:'124343444',
+                        birthday: '2016-05-04',
+                        name: '王小虎',
+                        motto:'',
+                    }, {
+                        id:"3",
+                        username:'nnn',
+                        classname:"",
+                        phone:'124343444',
+                        birthday: '2016-05-01',
+                        name: '王小虎',
+                        motto:'',
+                    }, {
+                        id:'4',
+                        username:'xx',
+                        phone:'124343444',
+                        birthday: '2016-05-03',
+                        classname:"",
+                        motto:'',
+                        name: '王小虎',
+                    }]
+                }
+            },
+            methods:{
+                onSubmit() {
+                    console.log('submit!');
+                },
+                formatter(row, column) {
+                    return row.address;
+                }
+            }
+        })
+    </script>
+</html>

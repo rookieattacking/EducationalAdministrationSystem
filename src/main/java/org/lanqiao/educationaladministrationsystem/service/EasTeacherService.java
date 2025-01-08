@@ -1,6 +1,7 @@
 package org.lanqiao.educationaladministrationsystem.service;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.lanqiao.educationaladministrationsystem.dto.EasTeacher.TeacherPageBean;
 import org.lanqiao.educationaladministrationsystem.dto.EasTeacher.TeacherPageList;
 import org.lanqiao.educationaladministrationsystem.pojo.EasTeacher;
@@ -16,6 +17,12 @@ public interface EasTeacherService {
     查询所有
      */
     List<EasTeacher> selectAll();
+
+
+    /* 根据教师姓名获取教师的id */
+    int getTeacherId(String username);
+
+
 
     /*
     修改功能

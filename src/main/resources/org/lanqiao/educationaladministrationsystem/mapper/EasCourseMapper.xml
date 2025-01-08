@@ -12,71 +12,26 @@
         <result column="choice_num"  property="choiceNum" />
     </resultMap>
 
+    <resultMap id="ResultMapCourse" type="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
+        <id column="id" property="id"/>
+        <result column="start_date"   property="startDate" />
+        <result column="end_date"   property="endDate" />
+        <result column="class_hour"  property="classHour" />
+        <result column="test_mode"  property="testMode" />
+        <result column="student_num"  property="studentNum" />
+        <result column="choice_num"  property="choiceNum" />
+        <result column="t_id" property="tId"/>
+        <result column="base_course_id" property="baseCourseId"/>
+    </resultMap>
+
 
     <sql id="Base_Column_List">
     id, start_date, end_date, class_hour, test_mode, student_num, choice_num, t_id, base_course_id
     </sql>
 
+    <!--添加 -->
     <insert id="addCourse" parameterType="org.lanqiao.educationaladministrationsystem.pojo.EasCourse">
-        insert into eas_course
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="startDate != null">
-                start_date,
-            </if>
-            <if test="endDate != null">
-                end_date,
-            </if>
-            <if test="classHour != null">
-                class_hour,
-            </if>
-            <if test="testMode != null">
-                test_mode,
-            </if>
-            <if test="studentNum != null">
-                student_num,
-            </if>
-            <if test="choiceNum != null">
-                choice_num,
-            </if>
-            <if test="tId != null">
-                t_id,
-            </if>
-            <if test="baseCourseId != null">
-                base_course_id,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=INTEGER},
-            </if>
-            <if test="startDate != null">
-                #{startDate,jdbcType=DATE},
-            </if>
-            <if test="endDate != null">
-                #{endDate,jdbcType=DATE},
-            </if>
-            <if test="classHour != null">
-                #{classHour,jdbcType=SMALLINT},
-            </if>
-            <if test="testMode != null">
-                #{testMode,jdbcType=VARCHAR},
-            </if>
-            <if test="studentNum != null">
-                #{studentNum,jdbcType=INTEGER},
-            </if>
-            <if test="choiceNum != null">
-                #{choiceNum,jdbcType=INTEGER},
-            </if>
-            <if test="tId != null">
-                #{tId,jdbcType=VARCHAR},
-            </if>
-            <if test="baseCourseId != null">
-                #{baseCourseId,jdbcType=INTEGER},
-            </if>
-        </trim>
+        insert into eas_course values (null,#{startDate},#{endDate},#{classHour}${testMode},#{studentNum},0,0,#{tId},#{baseCourseId})
     </insert>
 
     <!-- 加入if判断日期!=null 会更新失败-->
@@ -327,6 +282,22 @@
 
 
 
+
+
+    <!--添加-->
+
+
+<!-- SELECT *
+        FROM eas_course s
+                 LEFT JOIN eas_base_course c ON s.base_course_id = c.id
+                 LEFT JOIN eas_teacher t ON s.t_id = t.id-->
+
+
+
+
+
+
+
     <!--分页查询计算总行数-->
     <select id="getCount" resultType="java.lang.Integer">
         SELECT COUNT(c.id)
@@ -335,12 +306,6 @@
                  LEFT JOIN eas_teacher t ON s.t_id = t.id
     </select>
 
-
-
-<!-- SELECT *
-        FROM eas_course s
-                 LEFT JOIN eas_base_course c ON s.base_course_id = c.id
-                 LEFT JOIN eas_teacher t ON s.t_id = t.id-->
     <!--分页查询-->
     <select id="getPageList" resultType="org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery" resultMap="BaseResultMap">
         select c.id id,c.coursename,t.username,b.* from eas_course b left join eas_base_course c on b.base_course_id = c.id left join eas_teacher t on b.t_id = t.id

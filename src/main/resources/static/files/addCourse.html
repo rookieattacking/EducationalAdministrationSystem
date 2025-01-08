@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <title>添加课程</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="js/Vue.main.js"></script>
-    <script src="js/index.js"></script>
-    <script src="js/axios.js"></script>
+    <script src="../js/Vue.main.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/axios.js"></script>
     <style>
         .course-container {
             position: relative;
@@ -58,6 +58,7 @@
     </style>
 </head>
 <body>
+
 <div id="app">
     <div class="course-container">
         <!-- 标题和关闭按钮 -->
@@ -87,7 +88,7 @@
                         <el-option
                                 v-for="item in teacherOptions"
                                 :key="item.id"
-                                :label="item.name"
+                                :label="item.username"
                                 :value="item.id">
                         </el-option>
                     </el-select>
@@ -140,16 +141,16 @@
         </el-form>
     </div>
 </div>
-
+</div>
+</body>
 <script>
     new Vue({
         el: '#app',
         data() {
             return {
                 courseForm: {
-                    baseCourseId: '',
-                    tId: '',
-                    startDate: '',
+                    coursename:'',// 课程名
+                    username: '', // 教师名
                     endDate: '',
                     classHour: '',
                     testMode: '',
@@ -159,50 +160,43 @@
                 teacherOptions: []     // 教师选项
             }
         },
-        created() {
-            // 获取课程列表
-            // this.getBaseCourses();
-            // 获取教师列表
-            // this.getTeachers();
-        },
         methods: {
-            // 获取课程列表
-            async getBaseCourses() {
-                try {
-                    const res = await axios.get('/easBaseCourse/search');
-                    this.baseCourseOptions = res.data;
-                } catch (error) {
-                    this.$message.error('获取课程列表失败');
-                }
+            // 1.要先获取所有的课程信息
+            getAllCourse(){
+              axios({
+                  url:'http://localhost:8080/easCourse/courseList',
+                  method:'post',
+              }).then(res =>{
+                  console.log(res.data)
+                  this.baseCourseOptions  = res.data.data;
+              })
             },
-
-            // 获取教师列表
-            async getTeachers() {
-                try {
-                    const res = await axios.get('/easTeacher/search');
-                    this.teacherOptions = res.data;
-                } catch (error) {
-                    this.$message.error('获取教师列表失败');
-                }
+            // 2.获取所有的教师信息
+            getTeacherList(){
+                axios({
+                    url:'http://localhost:8080/easCourse/teacherList',
+                    method:'post',
+                }).then(res =>{
+                    console.log(res.data)
+                    this.teacherOptions = res.data.data;
+                })
             },
-
             // 提交表单
             submitForm() {
-                this.$refs.courseForm.validate(async (valid) => {
-                    if (valid) {
-                        try {
-                            const res = await axios.post('/course/add', this.courseForm);
-                            if (res.data.code === 200) {
-                                this.$message.success('添加成功');
-                                this.closePage();
-                            } else {
-                                this.$message.error(res.data.msg || '添加失败');
-                            }
-                        } catch (error) {
-                            this.$message.error('添加失败');
-                        }
+                axios({
+                    url:'http://localhost:8080/easCourse/newAdd',
+                    method:'post',
+                    data:this.courseForm,
+                }).then(res =>{
+                    console.log(res.data)
+                    if(res.data.code == 200) {
+                        this.$message.success("添加成功");
+                    }else{
+                        this.$message.error("添加失败");
                     }
-                });
+                }).catch(() =>{
+                    this.$message.error("添加有误，请联系管理员");
+                })
             },
 
             // 重置表单
@@ -214,8 +208,11 @@
             handleClose() {
                 location.href = 'courseManage.html'
             }
+        },
+        mounted(){
+            this.getAllCourse();
+            this.getTeacherList();
         }
     })
 </script>
-</body>
 </html>

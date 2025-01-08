@@ -30,12 +30,16 @@ public class LoginController {
          *  1.管理员在登录的时候要将管理员的id存入session 中为后期修改密码用
          *  2.在登录的时候
          */
+        /* 登录 */
         EasUser byUserName = easUserService.getByUserName(easUser.getUsername());
         if(byUserName != null){
             /* 将用户的id存储到session中 */
             request.getSession().setAttribute("id",byUserName.getId());
             // 要拿到登录用户的id来获取角色id
             int roleId = easRoleService.getRoleId(byUserName.getId());
+            if(roleId != 1){
+                return new ResponseUtil(200,"登录成功",byUserName);
+            }
             return new ResponseUtil(200,"登录成功",roleId);
 
         }else{
@@ -51,11 +55,12 @@ public class LoginController {
          */
         if(easUser != null){
             EasUser byUserName = easUserService.getByUserName(easUser.getUsername());
-            System.out.println(easUser.getId());
+
             if(byUserName != null){
                 return new ResponseUtil(305,"用户已存在");
             }else{
-                int result = easUserService.add(easUser);
+
+                int result = easUserService.register(easUser);
                 /* 查询出的有id的数据 */
                 EasUser easUserNew = easUserService.getByUserName(easUser.getUsername());
                 /* 用户的Id */

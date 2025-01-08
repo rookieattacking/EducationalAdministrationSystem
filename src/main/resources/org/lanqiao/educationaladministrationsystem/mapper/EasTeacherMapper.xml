@@ -83,16 +83,62 @@
         select * from eas_teacher
         <where>
             <if test="name != null and name != '' ">
-                 and name like concat('%',#{name},'%')
+                name like concat('%',#{name},'%')
             </if>
             <if test="education != null and education != ''">
                 and education like concat('%',#{education},'%')
             </if>
         </where>
     </select>
-    <select id="getTotal" resultType="java.lang.Integer">
+
+    <!--分页查询总页数-->
+    <select id="getCount" resultType="java.lang.Integer">
         select count(*) from eas_teacher
     </select>
+
+
+    <!--分页查询-->
+    <select id="selectByPage" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
+        select * from eas_teacher
+                          limit #{offSet},#{pageSize}
+    </select>
+
+
+    <!--分页查询模糊查询-->
+    <select id="BigPageList" resultType="org.lanqiao.educationaladministrationsystem.pojo.EasTeacher">
+        select * from eas_teacher
+        <where>
+            <if test="teacherPageList.name != null and teacherPageList.name != '' ">
+                name like concat('%',#{teacherPageList.name},'%')
+            </if>
+            <if test="teacherPageList.education != null and teacherPageList.education != ''">
+                and education like concat('%',#{teacherPageList.education},'%')
+            </if>
+        </where>
+        LIMIT #{offSet}, #{teacherPageList.pageSize}
+    </select>
+
+
+    <!-- //查询总记录数-->
+    <select id="selectTotal" resultType="java.lang.Integer">
+        select count(*) from eas_teacher
+    </select>
+
+    <!--分页模糊查询的总数-->
+    <select id="teacherCount" resultType="java.lang.Integer">
+        select count(*) from eas_teacher
+        <where>
+            <if test="teacherPageList.name != null and teacherPageList.name != '' ">
+                name like concat('%',#{teacherPageList.name},'%')
+            </if>
+            <if test="teacherPageList.education != null and teacherPageList.education != ''">
+                and education like concat('%',#{teacherPageList.education},'%')
+            </if>
+        </where>
+    </select>
+
+
+
 
 
 </mapper>

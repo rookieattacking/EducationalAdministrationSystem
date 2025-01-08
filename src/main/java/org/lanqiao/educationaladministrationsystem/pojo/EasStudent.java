@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EasStudent {
-
   private long id;
   private String username;
   private String name;
@@ -17,8 +16,5 @@ public class EasStudent {
   private String phone;
   private long classId;
   private String motto;
-  private String classes;
-
-
 
 }

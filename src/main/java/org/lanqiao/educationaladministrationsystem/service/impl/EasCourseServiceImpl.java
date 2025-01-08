@@ -4,17 +4,31 @@ import lombok.AllArgsConstructor;
 import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EasCourseQuery;
 import org.lanqiao.educationaladministrationsystem.dto.EasCourse.EaseCourseFuzzyQuery;
 import org.lanqiao.educationaladministrationsystem.mapper.EasCourseMapper;
+import org.lanqiao.educationaladministrationsystem.pojo.EasCourse;
 import org.lanqiao.educationaladministrationsystem.service.EasCourseService;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.plugins.tiff.TIFFImageReadParam;
 import java.util.List;
 
 @Service
 public class EasCourseServiceImpl implements EasCourseService {
     @Autowired
     private EasCourseMapper easCourseMapper;
+
+
+    /* 添加 */
+    @Override
+    public int addCourse(EasCourse easCourse) {
+        int result = easCourseMapper.addCourse(easCourse);
+        if(result > 0)  {
+            return result;
+        }
+        return 0;
+    }
+
     /* 分页查询 */
     @Override
     public PageHelperUtil<EasCourseQuery> getPageList(int pageNum, int pageSize) {

@@ -16,6 +16,8 @@ public interface EasUserService {
     /* 登录 */
     EasUser login(String username,String password);
 
+    /* 注册 */
+    int register(EasUser easUser);
 
 
     /* 查询用户信息 */

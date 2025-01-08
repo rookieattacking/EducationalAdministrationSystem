@@ -20,5 +20,13 @@ public class EasCourse {
   private long tId;
   private long baseCourseId;
 
-
+  public EasCourse(String startDate, String endDate, long classHour, String testMode, long studentNum, long tId, long baseCourseId) {
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.classHour = classHour;
+    this.testMode = testMode;
+    this.studentNum = studentNum;
+    this.tId = tId;
+    this.baseCourseId = baseCourseId;
+  }
 }

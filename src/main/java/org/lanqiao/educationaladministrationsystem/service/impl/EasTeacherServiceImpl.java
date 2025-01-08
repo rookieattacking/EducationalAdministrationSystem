@@ -20,7 +20,8 @@ public class EasTeacherServiceImpl  implements EasTeacherService {
     private EasTeacherMapper easTeacherMapper;
 
 
-    //查询全部
+
+    /* 查询所有的教师信息 */
     @Override
     public List<EasTeacher> selectAll() {
         List<EasTeacher> teacher = easTeacherMapper.selectAll();
@@ -31,6 +32,18 @@ public class EasTeacherServiceImpl  implements EasTeacherService {
         }
 
     }
+
+    /* 根据教师姓名获取教师的id */
+    @Override
+    public int getTeacherId(String username) {
+        int teacherId = easTeacherMapper.getTeacherId(username);
+        if(teacherId != 0){
+            return teacherId;
+        }
+        return 0;
+    }
+
+
     //修改功能
     @Override
     public int update(EasTeacher easTeacher) {

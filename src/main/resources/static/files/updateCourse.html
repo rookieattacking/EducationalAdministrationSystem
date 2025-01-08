@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>修改课程</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="../js/Vue.main.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/axios.js"></script>
+    <style>
+        .course-container {
+            position: relative;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #909399;
+        }
+
+        .close-btn:hover {
+            color: #409EFF;
+        }
+
+        .course-form {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-item {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="course-container">
+        <!-- 标题和关闭按钮 -->
+        <div class="header">
+            <div class="title">修改课程</div>
+            <i class="el-icon-close close-btn" @click="handleClose"></i>
+        </div>
+
+        <!-- 表单内容 -->
+        <div class="course-form">
+            <el-form :model="courseForm" ref="courseForm" label-width="100px">
+            <!-- 第一行：课程和任课教师 -->
+            <div class="form-row">
+                <el-form-item label="课程" class="form-item">
+                    <el-select v-model="courseForm.baseCourseId" placeholder="请选择课程">
+                        <el-option
+                                v-for="item in baseCourseOptions"
+                                :key="item.id"
+                                :label="item.coursename"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="任课教师" class="form-item">
+                    <el-select v-model="courseForm.tId" placeholder="请选择教师">
+                        <el-option
+                                v-for="item in teacherOptions"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </div>
+
+            <!-- 第二行：开始时间和结束时间 -->
+            <div class="form-row">
+                <el-form-item label="开始时间" class="form-item">
+                    <el-date-picker
+                            v-model="courseForm.startDate"
+                            type="date"
+                            placeholder="选择开始日期">
+                    </el-date-picker>
+                </el-form-item>
+
+                <el-form-item label="结束时间" class="form-item">
+                    <el-date-picker
+                            v-model="courseForm.endDate"
+                            type="date"
+                            placeholder="选择结束日期">
+                    </el-date-picker>
+                </el-form-item>
+            </div>
+
+            <!-- 第三行：课时和考核方式 -->
+            <div class="form-row">
+                <el-form-item label="课时" class="form-item">
+                    <el-input v-model="courseForm.classHour" placeholder="请输入课时"></el-input>
+                </el-form-item>
+
+                <el-form-item label="考核方式" class="form-item">
+                    <el-input v-model="courseForm.testMode" placeholder="请输入考核方式"></el-input>
+                </el-form-item>
+            </div>
+
+            <!-- 第四行：人数 -->
+            <div class="form-row">
+                <el-form-item label="人数" class="form-item">
+                    <el-input v-model="courseForm.studentNum" placeholder="请输入人数"></el-input>
+                </el-form-item>
+            </div>
+
+            <!-- 按钮组 -->
+            <div style="text-align: center; margin-top: 30px;">
+                <el-button type="primary" @click="submitForm">提交</el-button>
+                <el-button @click="resetForm">重置</el-button>
+                <el-button @click="handleClose">关闭页面</el-button>
+            </div>
+        </el-form>
+    </div>
+</div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                courseForm: {
+                    id: '', // 课程id
+                    tId: '',  //
+                    startDate: '',
+                    endDate: '',
+                    classHour: '',
+                    testMode: '',
+                    studentNum: ''
+                },
+                baseCourseOptions: [], // 课程选项
+                teacherOptions: []     // 教师选项
+            }
+        },
+        methods: {
+            // 1.要先获取所有的课程信息
+            getAllCourse(){
+                axios({
+                    url:'http://localhost:8080/easCourse/courseList',
+                    method:'post',
+                }).then(res =>{
+                    console.log(res.data)
+                    this.baseCourseOptions  = res.data.data;
+                })
+            },
+            // 2.获取所有的教师信息
+            getTeacherList(){
+                axios({
+                    url:'http://localhost:8080/easCourse/teacherList',
+                    method:'post',
+                }).then(res =>{
+                    console.log(res.data)
+                    this.teacherOptions = res.data.data;
+                })
+            },
+
+            // 提交表单
+            submitForm() {
+               // todo:
+            },
+
+            // 重置表单
+            resetForm() {
+                this.$refs.courseForm.resetFields();
+            },
+
+            // 关闭页面
+            handleClose() {
+                location.href = 'courseManage.html'
+            }
+        },
+        mounted(){
+            this.getAllCourse();
+            this.getTeacherList();
+        }
+    })
+</script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import org.lanqiao.educationaladministrationsystem.pojo.EasNotice;
 import org.lanqiao.educationaladministrationsystem.service.EasNoticeService;
 import org.lanqiao.educationaladministrationsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/notice")
+@Transactional(rollbackFor = Exception.class)
 public class EasNoticeController {
     @Autowired
     private EasNoticeService easNoticeService;

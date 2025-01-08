@@ -82,4 +82,12 @@
         </foreach>
     </delete>
 
+    <!--新添加基本课程信息-->
+    <insert id="addNewBaseCourse">
+        insert into eas_base_course
+        values (null,#{coursename},'新课程')
+    </insert>
+
+
+
 </mapper>

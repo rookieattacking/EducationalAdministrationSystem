@@ -8,6 +8,7 @@ import org.lanqiao.educationaladministrationsystem.service.EasTeacherService;
 import org.lanqiao.educationaladministrationsystem.utils.PageHelperUtil;
 import org.lanqiao.educationaladministrationsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,10 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/teacher")
+@Transactional(rollbackFor = Exception.class)
 public class EasTeacherController {
     @Autowired
     private EasTeacherService easTeacherService;
-
 
 
     //查询功能

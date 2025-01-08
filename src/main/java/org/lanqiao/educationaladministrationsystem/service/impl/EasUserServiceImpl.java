@@ -17,6 +17,7 @@ import java.util.List;
 public class EasUserServiceImpl implements EasUserService {
     @Autowired
     private EasUserMapper easUserMapper;
+    /* 登录 */
     @Override
     public EasUser login(String username, String password) {
         EasUser login = easUserMapper.login(username, password);
@@ -24,6 +25,16 @@ public class EasUserServiceImpl implements EasUserService {
             return login;
         }
         return null;
+    }
+
+    /* 注册 */
+    @Override
+    public int register(EasUser easUser) {
+        int result = easUserMapper.register(easUser);
+        if(result > 0){
+            return result;
+        }
+        return 0;
     }
 
     /* 查询用户信息 */

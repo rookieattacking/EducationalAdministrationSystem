@@ -26,6 +26,16 @@ public interface EasTeacherMapper {
     //根据id删除操作
     int deleteTeacher(Long id);
 
+
+   /* 根据教师姓名获取教师的id */
+    @Select("select id from eas_teacher where username = #{username}")
+    int getTeacherId(String username);
+
+
+    /* 查询所有的教师信息 */
+    @Select("select * from eas_teacher")
+    EasTeacher getTeacherList();
+
     /*
     分页查询
      */

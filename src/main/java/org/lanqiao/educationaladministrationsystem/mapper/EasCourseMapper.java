@@ -17,7 +17,6 @@ public interface EasCourseMapper {
 
     List<EasCourse> findCourseByBaseCourseIdAndTeacherId(@Param("baseCourseId") Integer baseCourseId,@Param("tId") Integer tId);
 
-    int addCourse(EasCourse easCourse);
 
     EasCourse getCourseById(Integer id);
 
@@ -49,6 +48,8 @@ public interface EasCourseMapper {
 
 
 
+    /* 添加  */
+    int addCourse(EasCourse easCourse);
 
 
     /* 分页查询计算总行数 */
